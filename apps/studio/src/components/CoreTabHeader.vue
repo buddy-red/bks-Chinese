@@ -1,0 +1,154 @@
+<template>
+  <div class="nav-item-wrap" v-hotkey="keymap">
+    <li class="nav-item" :title="title + scope" @contextmenu="$emit('contextmenu', $event)">
+      <a
+        class="nav-link"
+        @mousedown="mousedown"
+        @click.middle.prevent="maybeClose"
+        @contextmenu="$bks.openMenu({item: tab, options: contextOptions, event: $event})"
+        :class="{ active: selected }"
+      >
+        <tab-icon :tab="tab" />
+        <span class="tab-title truncate" :title="title + scope">{{title}} <span v-if="scope" class="tab-title-scope">{{scope}}</span></span>
+        <div class="tab-action">
+          <span class="tab-close" @mouseenter="hover=true" @mouseleave="hover=false" @mousedown.stop="doNothing" @click.prevent.stop="maybeClose">
+            <i class="material-icons close" v-if="hover || !closeIcon">close</i>
+            <i class="material-icons unsaved" v-else>{{closeIcon}}</i>
+          </span>
+        </div>
+      </a>
+    </li>
+    <modal :name="modalName" class="beekeeper-modal vue-dialog sure header-sure" @opened="sureOpened" @closed="sureClosed" @before-open="beforeOpened">
+      <div class="dialog-content">
+        <div class="dialog-c-title">确定要关闭 <span class="tab-like"><tab-icon :tab="tab" /> {{this.tab.title}}</span>?</div>
+        <p>您将丢失未保存的更改</p>
+      </div>
+      <div class="vue-dialog-buttons">
+        <span class="expand"></span>
+        <button ref="no" @click.prevent="$modal.hide(modalName)" class="btn btn-sm btn-flat">取消</button>
+        <button @focusout="sureOpen && $refs.no && $refs.no.focus()" @click.prevent="closeForReal" class="btn btn-sm btn-primary">关闭标签页</button>
+      </div>
+    </modal>
+  </div>
+</template>
+<script>
+import TabIcon from './tab/TabIcon.vue'
+
+  export default {
+  components: { TabIcon },
+    props: ['tab', 'tabsCount', 'selected'],
+    data() {
+      return {
+        unsaved: false,
+        hover: false,
+        sureOpen: false,
+        lastFocused: null
+      }
+    },
+    methods: {
+      beforeOpened() {
+        this.lastFocused = document.activeElement
+      },
+      sureOpened() {
+        this.sureOpen = true
+        this.$refs.no.focus()
+      },
+      sureClosed() {
+        this.sureOpen = false
+        if (this.lastFocused) {
+          this.lastFocused.focus()
+        }
+      },
+      closeForReal() {
+        this.$modal.hide(this.modalName)
+        this.$nextTick(() => {
+          this.$emit('close', this.tab)
+        })
+      },
+      async maybeClose(event) {
+        event.stopPropagation()
+        event.preventDefault()
+        if (this.tab.unsavedChanges) {
+          this.$modal.show(this.modalName)
+        } else {
+          this.$emit('close', this.tab)
+        }
+      },
+      doNothing() {
+
+      },
+      mousedown(e) {
+        if (e.which === 1) {
+          this.$emit('click', this.tab)
+        }
+      }
+    },
+    watch: {
+    },
+    computed: {
+      contextOptions() {
+        return [
+          { name: "关闭", slug: 'close', handler: ({event}) => this.maybeClose(event)},
+          { name: "关闭其它", slug: 'close-others', handler: ({item}) => this.$emit('closeOther', item)},
+          { name: '全部关闭', slug: 'close-all', handler: ({item}) => this.$emit('closeAll', item)},
+          { name: "复制", slug: 'duplicate', handler: ({item}) => this.$emit('duplicate', item) }
+        ]
+      },
+      modalName() {
+        return `sure-${this.tab.id}`
+      },
+      closeIcon() {
+        if (this.tab.alert) return 'error_outline'
+        if (this.tab.unsavedChanges) return 'fiber_manual_record'
+        return null
+      },
+      keymap() {
+        const result = {}
+        if (this.selected) {
+          result[this.ctrlOrCmd('w')] = this.maybeClose
+        }
+
+        return result
+      },
+      cleanText() {
+        // no spaces
+        if (!this.tab.text) {
+          return null
+        }
+        const result = this.tab.text.replace(/\s+/, '')
+        return result.length === 0 ? null : result
+      },
+      scope() {
+        if (this.tab.titleScope) {
+          return ' ' + '[' + this.tab.titleScope + ']'
+        } else {
+          return ''
+        }
+      },
+      tableTabTitle() {
+        if (!this.tab.type === 'table') return null;
+        let result = this.tab.table.name
+        return result
+      },
+      queryTabTitle() {
+        if (!this.tab.type === 'query') return null
+        if (this.tab.query && this.tab.query.title) {
+          return this.tab.query.title
+        }
+        if (!this.cleanText) {
+          return this.tab.title
+        }
+
+        if (this.tab.query.text.length >= 32) {
+          return `${this.tab.query.text.substring(0, 32)}...`
+        } else {
+          return this.tab.query.text
+        }
+      },
+      title() {
+        return this.queryTabTitle || this.tableTabTitle || "未知"
+      },
+    }
+  }
+
+</script>

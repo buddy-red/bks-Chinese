@@ -1,0 +1,52 @@
+
+// Pinned
+// ----------------------------------
+.pinned {
+  .list-group {
+    .list-item {
+      span.item-wrapper {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .list-item-btn {
+      .actions {
+        display: flex;
+        .btn-fab {
+          &.pinned {
+            display: none;
+          }
+          &.unpin {
+            display: inline-flex;
+          }
+        }
+      }
+    }
+  }
+}
+.table-list {
+  .list-group {
+    min-height: 105px;
+    // height: 100%;
+
+    .list-item {
+      &:before {
+        border-left: 0 !important;
+      }
+    }
+    .list-item-btn {
+      padding: 0;
+      padding-right: $gutter-h * 0.5;
+      .item-wrapper {
+        overflow: hidden;
+      }
+    }
+  }
+  .list-body {
+    padding-bottom: $gutter-w;
+  }
+  .empty {
+    padding-top: $gutter-w;
+    padding-bottom: $gutter-w;
+  }
+}

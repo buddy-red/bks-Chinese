@@ -1,0 +1,105 @@
+version: '3'
+volumes:
+  mssql:
+  mssqllatin:
+  mysql:
+  mysql8:
+  psql96:
+  psql13:
+  mariadb:
+  cockroachdb:
+
+services:
+
+  psql13:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: saklia
+    volumes:
+      - psql13:/var/lib/postgresql/data
+      - ./dev/docker_psql_init:/docker-entrypoint-initdb.d
+    ports:
+      - 5433:5432
+  psql:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: saklia
+    volumes:
+      - psql96:/var/lib/postgresql/data
+      - ./dev/docker_psql_init:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: test
+    ports:
+      - 3307:3306
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./dev/docker_mysql_init:/docker-entrypoint-initdb.d
+  mysql8:
+    image: mysql:8.0.21
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: test
+    ports:
+      - 3308:3306
+    volumes:
+      - mysql8:/var/lib/mysql
+      - ./dev/docker_mysql_init:/docker-entrypoint-initdb.d
+  mysql:
+    image: mysql:5.7.22
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: test
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./dev/docker_mysql_init:/docker-entrypoint-initdb.d
+  sqlserver:
+    image: "mcr.microsoft.com/mssql/server:2017-latest-ubuntu"
+    volumes:
+      - mssql:/var/opt/mssql/data
+      - ./dev/docker_sqlserver:/docker_init
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSSQL_PID: "Express"
+      SA_PASSWORD: "Example@1"
+    ports:
+      - 1433:1433
+    command: sh -c ' chmod +x /docker_init/entrypoint.sh; /docker_init/entrypoint.sh & /opt/mssql/bin/sqlservr;'
+  sqlserverlatin:
+    image: 'mcr.microsoft.com/mssql/server:2017-latest-ubuntu'
+    volumes:
+    - mssqllatin:/var/opt/mssql/data
+    - ./dev/docker_sqlserver:/docker_init
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: Example@1"
+      MSSQL_COLLATION: Latin1_General_CS_AS
+      MSSQL_PID: "Express"
+    ports:
+      - 1434:1433
+    command: sh -c ' chmod +x /docker_init/entrypoint.sh; /docker_init/entrypoint.sh & /opt/mssql/bin/sqlservr;'
+  cockroachdb:
+    image: cockroachdb/cockroach:v22.1.1
+    volumes:
+      - cockroachdb:/cockroach/cockroach-data
+    ports:
+      - 26257:26257
+    command: start-single-node --insecure
+
+
