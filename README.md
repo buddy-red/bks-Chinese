@@ -73,73 +73,16 @@ We love *any* community engagement. Even if you're complaining because you don't
 
 - By contributing to the project you agree to the terms of our [contributor guidelines](CONTRIBUTING.md).
 
-### Contribute without coding
 
-We have you covered, read our [guide to contributing in 10 minutes without coding](https://github.com/beekeeper-studio/beekeeper-studio/issues/287).
-
-### Compiling and Running Beekeeper Studio Locally
-
-Want to write some code and improve Beekeeper Studio? Getting set-up is easy on Mac, Linux, or Windows.
+### 编译
 
 ```bash
-# First: Install NodeJS 12 or 14, NPM, and Yarn
-# ...
 
-# 1. Fork the Beekeeper Studio Repo (click fork button at top right of this screen)
-# 2. Check out your fork:
-git clone git@github.com:<your-username>/beekeeper-studio.git beekeeper-studio
 cd beekeeper-studio/
-yarn install # installs dependencies
+yarn install
+yarn run electron:serve
 
-# Now you can start the app:
-yarn run electron:serve ## the app will now start
 ```
-
-### Where to make changes?
-
-This repo is now a monorepo, we have several places with code, but only really a couple of important entry points.
-
-All app code lives in `apps/studio`, some shared code lives in `shared/src`. This is shared with other apps.
-
-Beekeeper Studio has two entry points:
-- `background.js` - this is the electron-side code that controls native things like showing windows.
-- `main.js` - this is the entry point for the Vue.js app. You can follow the Vue component breadcrumbs from `App.vue` to find the screen you need.
-
-**Generally we have two 'screens':**
-- ConnectionInterface - connecting to a DB
-- CoreInterface - interacting with a database
-
-### How to submit a change?
-
-
-- Push your changes to your repository and open a Pull Request from our github page (this page)
-- Make sure to write some notes about what your change does! A gif is always welcome for visual changes.
-
-## Maintainer notes (casual readers can ignore this stuff)
-
-
-### Release Process
-
-1. Up the version number in package.json
-2. Replace `build/release-notes.md` with the latest release notes. Follow the format that is there.
-  - run `git log <last-tag>..HEAD --oneline | grep 'Merge pull'` to find PRs merged
-2. Commit
-3. Push to master
-4. Create a tag `git tag v<version>`. It must start with a 'v'
-5. `git push origin <tagname>`
-  - Now wait for the build/publish action to complete on Github
-6. Push the new release live
-  - Go to the new 'draft' release on the releases tab of github, edit the notes, publish
-  - Log into snapcraft.io, drag the uploaded release into the 'stable' channel for each architecture.
-
-This should also publish the latest docs
-
-Post Release:
-1. Copy release notes to a blog post, post on website
-2. Tweet link
-3. Share on LinkedIn
-4. Send to mailing list on SendInBlue
-
 
 ## Big Thanks
 
