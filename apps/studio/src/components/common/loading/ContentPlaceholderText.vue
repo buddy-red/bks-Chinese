@@ -1,6 +1,6 @@
 <template>
   <div :class="className">
-    <div v-for="行数为n" :key="n" :class="`${className}__line`" />
+    <div v-for="n in lines" :key="n" :class="`${className}__line`" />
   </div>
 </template>
 

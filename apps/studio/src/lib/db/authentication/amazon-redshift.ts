@@ -75,16 +75,16 @@ export class RedshiftCredentialResolver {
     async getClusterCredentials(awsCredentials: AWSCredentials, config: ClusterCredentialConfiguration): Promise<TemporaryClusterCredentials> {
       // Validate that all required fields have been provided
       if (!awsCredentials.accessKeyId) {
-        throw new Error('Please provide an Access Key ID for IAM authentication.');
+        throw new Error('请提供用于IAM身份验证的访问密钥ID');
       }
       if (!awsCredentials.secretAccessKey) {
-        throw new Error('Please provide a Secret Access Key for IAM authentication.');
+        throw new Error('请提供用于IAM身份验证的秘密访问密钥');
       }
       if (!config.awsRegion) {
-        throw new Error('Please provide an AWS Region for IAM authentication.');
+        throw new Error('请提供用于IAM身份验证的AWS区域');
       }
       if (!config.clusterIdentifier) {
-        throw new Error('Please provide a Cluster Identifier for IAM authentication.');
+        throw new Error('请提供用于IAM身份验证的集群标识符.');
       }
 
       // Get any existing credentials
@@ -95,7 +95,7 @@ export class RedshiftCredentialResolver {
       // instead of refreshing. This prevents excessive calling to Redshift's control plane
       // when we have credentials that we know with high confidence are still valid.
       if (!this.shouldRefreshCredentials(credentials)) {
-        console.log(`Re-using existing Redshift cluster credentials.`);
+        console.log(`重新使用现有的Redshift集群凭证.`);
         return credentials;
       }
 
@@ -106,7 +106,7 @@ export class RedshiftCredentialResolver {
       });
 
       // Get the credentials
-      console.log(`Calling Redshift to get temporary cluster credentials with config ${JSON.stringify(config)}`)
+      console.log(`调用Redshift以使用配置获取临时集群凭证 ${JSON.stringify(config)}`)
       const tempCredsResponse = await redshiftClient.send(new GetClusterCredentialsCommand({
         ClusterIdentifier: config.clusterIdentifier,
         DbName: config.dbName,
@@ -115,7 +115,7 @@ export class RedshiftCredentialResolver {
         DurationSeconds: config.durationSeconds || undefined,
         AutoCreate: true
       }));
-      console.log(`Redshift temporary cluster credentials will expire at ${tempCredsResponse.Expiration!}`)
+      console.log(`Redshift临时集群凭证将于 ${tempCredsResponse.Expiration!}`)
 
       const newCredentials = {
         dbUser: tempCredsResponse.DbUser!,
