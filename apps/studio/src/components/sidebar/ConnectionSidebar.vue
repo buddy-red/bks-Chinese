@@ -22,14 +22,14 @@
             <div class="list-heading">
               <div class="flex">
                 <div class="sub row flex-middle noselect">
-                  已保存 <span class="badge">{{(connectionConfigs || []).length}}</span>
+                  连接保存 <span class="badge">{{(connectionConfigs || []).length}}</span>
                 </div>
                 <span class="expand"></span>
                 <div class="actions">
-                  <a v-if="isCloud" @click.prevent="importFromLocal" title="从本地工作区导入数据库连接"><i class="material-icons">save_alt</i></a>
+                  <a v-if="isCloud" @click.prevent="importFromLocal" title="从本地工作区导入连接"><i class="material-icons">save_alt</i></a>
                   <a @click.prevent="refresh"><i class="material-icons">refresh</i></a>
                 </div>
-                <x-button class="actions-btn btn btn-link btn-small" title="筛选排序">
+                <x-button class="actions-btn btn btn-link btn-small" title="排序方式">
                   <!-- <span>{{sortables[this.sortOrder]}}</span> -->
                   <i class="material-icons-outlined">sort</i>
                   <!-- <i class="material-icons">arrow_drop_down</i> -->
@@ -50,7 +50,7 @@
             <error-alert :error="error" v-if="error" title="Problem loading connections" @close="error = null" :closable="true" />
             <sidebar-loading v-else-if="loading" />
             <div v-else-if="empty" class="empty">
-              <div class="empty-title">还没有已保存的连接</div>
+              <div class="empty-title">无保存连接</div>
               <div class="empty-actions" v-if="isCloud">
                 <a class="btn btn-flat btn-block btn-icon" @click.prevent="importFromLocal" title="Import connections from local workspace"><i class="material-icons">save_alt</i> 导入</a>
               </div>
@@ -60,7 +60,7 @@
                 v-for="{ folder, connections } in foldersWithConnections"
                 :key="`${folder.id}-${connections.length}`"
                 :title="`${folder.name} (${connections.length})`"
-                placeholder="无项目"
+                placeholder="No Items"
                 :expandedInitially="true"
               >
                 <connection-list-item
@@ -143,7 +143,7 @@ const log = rawLog.scope('connection-sidebar');
       sizes: [50,50],
       sortables: {
         labelColor: "颜色",
-        id: "日期",
+        id: "时间",
         name: "名称",
         connectionType: "类型"
       }
@@ -196,7 +196,7 @@ const log = rawLog.scope('connection-sidebar');
             this.$store.dispatch('data/connections/clearError');
             this.$store.dispatch('data/connectionFolders/clearError')
           } else {
-            log.warn("抱歉，无法设置具体错误！")
+            log.warn("无法设置实际错误，抱歉")
           }
         }
       },

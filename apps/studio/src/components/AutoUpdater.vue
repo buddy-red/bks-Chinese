@@ -12,12 +12,12 @@ export default {
   data() {
     return {
       manualNotification: new Noty({
-        text: "有一个新版本可用，可立即从我们的网站下载。",
+        text: "有新版本可用，可立即下载更新。",
         layout: 'bottomRight',
         timeout: false,
         closeWith: 'button',
         buttons: [ 
-          Noty.button('现在不装', 'btn btn-flat', () => {
+          Noty.button('现在不行', 'btn btn-flat', () => {
             this.manualNotification.close();
           }),
           Noty.button('下载', 'btn btn-primary', this.linkToDownload)
@@ -25,12 +25,12 @@ export default {
         queue: 'download'
       }),
       downloadNotification: new Noty({
-        text: '有一个新版本可用，现在下载？',
+        text: '已有新版本，要下载吗?',
         layout: 'bottomRight',
         timeout: false,
         closeWith: 'button',
         buttons: [
-          Noty.button('现在不装', 'btn btn-flat', () => {
+          Noty.button('现在不行', 'btn btn-flat', () => {
               this.downloadNotification.close();
           }),
           Noty.button('下载', 'btn btn-primary', this.triggerDownload)
@@ -38,7 +38,7 @@ export default {
         queue: 'download'
       }),
       installNotification: new Noty({
-        text: "更新已下载，重启Beekeeper Studio进行安装",
+        text: "已下载更新，请重启巴豆！",
         layout: 'bottomRight',
         timeout: false,
         closeWith: 'button',
@@ -68,14 +68,14 @@ export default {
     triggerDownload() {
       ipcRenderer.send('download-update')
       this.downloadNotification.close()
-      this.$noty.info("稍等！正在下载更新...")
+      this.$noty.info("请稍等! 正在下载更新...")
     },
     notifyManual() {
       this.closeAll()
       this.manualNotification.show()
     },
     linkToDownload() {
-      ipcRenderer.send(AppEvent.openExternally, ["https://beekeeperstudio.io/get"])
+      ipcRenderer.send(AppEvent.openExternally, ["https://github.com/buddy-red/bks-Chinese"])
     },
     triggerInstall() {
       ipcRenderer.send('install-update')

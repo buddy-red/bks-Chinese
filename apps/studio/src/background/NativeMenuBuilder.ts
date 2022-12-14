@@ -27,8 +27,8 @@ export default class NativeMenuBuilder {
       this.electron.Menu.setApplicationMenu(this.menu)
     } else {
       this.electron.Menu.setApplicationMenu(null)
-      this.listenForClicks()
     }
+    this.listenForClicks()
   }
 
   listenForClicks() {
@@ -40,7 +40,7 @@ export default class NativeMenuBuilder {
           func(arg || null, window)
         }
       } catch (e) {
-        console.error(`不能出发操作 ${actionName}(${arg || ""}), ${e.message}`)
+        console.error(`Couldn't trigger action ${actionName}(${arg || ""}), ${e.message}`)
       }
     })
   }

@@ -8,7 +8,7 @@
           <div class="alert alert-warning" v-if="$config.isSnap">
             <i class="material-icons">error_outline</i>
             <div>
-              您好snap用户! 如果你想在外部驱动器上使用sqlite数据库，你需要给Beekeeper一些额外的权限
+              嘿Snap用户！如果你想在外部驱动器上使用sqlite数据库，你需要给本系统一些额外权限
               <external-link :href="snap">了解更多</external-link>
             </div>
           </div>
@@ -27,7 +27,7 @@
     },
     data() {
       return {
-        snap: "http://docs.beekeeperstudio.io/troubleshooting/#i-get-permission-denied-when-trying-to-access-a-database-on-an-external-drive"
+        snap: "https://github.com/buddy-red/bks-Chinese"
       }
     }
   }

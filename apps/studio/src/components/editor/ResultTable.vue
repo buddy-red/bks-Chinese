@@ -10,6 +10,7 @@
   import dateFormat from 'dateformat'
   import Converter from '../../mixins/data_converter'
   import Mutators, { escapeHtml } from '../../mixins/data_mutators'
+  import { dialectFor } from '@shared/lib/dialects/models'
   import globals from '@/common/globals'
   import Papa from 'papaparse'
   import { mapState } from 'vuex'
@@ -64,6 +65,66 @@
       tableTruncated() {
           return this.result.truncated
       },
+
+      headerContextMenu() {
+        return [
+          {
+            label: '<x-menuitem><x-label>调整所有列的大小以匹配</x-label></x-menuitem>',
+            action: (_e, column) => {
+              try {
+                this.tabulator.blockRedraw()
+                const columns = this.tabulator.getColumns()
+                columns.forEach((col) => {
+                  col.setWidth(column.getWidth())
+                })
+              } catch (error) {
+                console.error(error)
+              } finally {
+                this.tabulator.restoreRedraw()
+              }
+            }
+          },
+          {
+          label: '<x-menuitem><x-label>调整所有列的大小以适合内容</x-label></x-menuitem>',
+          action: (_e, _column) => {
+            try {
+              this.tabulator.blockRedraw()
+              const columns = this.tabulator.getColumns()
+              columns.forEach((col) => {
+                col.setWidth(true)
+              })
+            } catch (error) {
+              console.error(error)
+            } finally {
+              this.tabulator.restoreRedraw()
+            }
+          }
+        },
+          {
+          label: '<x-menuitem><x-label>将所有列的大小调整为固定宽度</x-label></x-menuitem>',
+          action: (_e, _column) => {
+            try {
+              this.tabulator.blockRedraw()
+              const columns = this.tabulator.getColumns()
+              columns.forEach((col) => {
+                col.setWidth(200)
+              })
+              // const layout = this.tabulator.getColumns().map((c: CC) => ({
+              //   field: c.getField(),
+              //   width: c.getWidth(),
+              // }))
+              // this.tabulator.setColumnLayout(layout)
+              // this.tabulator.redraw(true)
+            } catch (error) {
+              console.error(error)
+            } finally {
+              this.tabulator.restoreRedraw()
+            }
+          }
+        }
+
+        ]
+      },
       cellContextMenu() {
         return [
           {
@@ -71,7 +132,7 @@
             action: (_e, cell) => this.$native.clipboard.writeText(cell.getValue())
           },
           {
-            label: '<x-menuitem><x-label>复制数据行(JSON)</x-label></x-menuitem>',
+            label: '<x-menuitem><x-label>复制行(JSON)</x-label></x-menuitem>',
             action: (_e, cell) => {
               const data = cell.getRow().getData()
               const fixed = this.dataToJson(data, true)
@@ -79,11 +140,11 @@
             }
           },
           {
-            label: '<x-menuitem><x-label>数据行(TSV / Excel)</x-label></x-menuitem>',
+            label: '<x-menuitem><x-label>复制行(TSV / Excel)</x-label></x-menuitem>',
             action: (_e, cell) => this.$native.clipboard.writeText(Papa.unparse([this.$bks.cleanData(cell.getRow().getData())], { header: false, quotes: true, delimiter: "\t", escapeFormulae: true }))
           },
           {
-            label: '<x-menuitem><x-label>数据行(Markdown)</x-label></x-menuitem>',
+            label: '<x-menuitem><x-label>复制行(Markdown)</x-label></x-menuitem>',
             action: (_e, cell) => {
               const data = cell.getRow().getData()
               const fixed = this.dataToJson(data, true)
@@ -94,7 +155,7 @@
             }
           },
           {
-            label: '<x-menuitem><x-label>数据行(Insert)</x-label></x-menuitem>',
+            label: '<x-menuitem><x-label>复制行(Insert)</x-label></x-menuitem>',
             action: async (_e, cell) => {
               const fixed = this.$bks.cleanData(cell.getRow().getData(), this.tableColumns)
 
@@ -119,11 +180,12 @@
             titleDownload: escapeHtml(column.name),
             dataType: column.dataType,
             width: columnWidth,
-            mutator: this.resolveTabulatorMutator(column.dataType),
+            mutator: this.resolveTabulatorMutator(column.dataType, dialectFor(this.connection.connectionType)),
             formatter: this.cellFormatter,
             maxInitialWidth: globals.maxColumnWidth,
             tooltip: true,
             contextMenu: this.cellContextMenu,
+            headerContextMenu: this.headerContextMenu,
             cellClick: this.cellClick.bind(this)
           }
           return result;
@@ -203,7 +265,10 @@
         };
         const dateString = dateFormat(new Date(), 'yyyy-mm-dd_hMMss')
         const title = this.query.title ? _.snakeCase(this.query.title) : "query_results"
-        this.tabulator.download(formatter, `${title}-${dateString}.${format}`, 'all')
+
+        // xlsx seems to be the only one that doesn't know what 'all' is it would seem https://tabulator.info/docs/5.4/download#xlsx
+        const options = typeof formatter !== 'function' && formatter.toLowerCase() === 'xlsx' ? {} : 'all'
+        this.tabulator.download(formatter, `${title}-${dateString}.${format}`, options)
       },
       clipboard(format = null) {
         // this.tabulator.copyToClipboard("all")

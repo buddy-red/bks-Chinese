@@ -60,17 +60,19 @@
 
       </div>
     </div>
-  <modal :name="modalName" class="beekeeper-modal vue-dialog sure header-sure" @opened="sureOpened" @closed="sureClosed" @before-open="beforeOpened">
-    <div class="dialog-content">
-      <div class="dialog-c-title">确定 {{this.dbAction | titleCase}} <span class="tab-like"><tab-icon :tab="tabIcon" /> {{this.dbElement}}</span>?</div>
-      <p>此更改无法撤消</p>
-    </div>
-    <div class="vue-dialog-buttons">
-      <span class="expand"></span>
-      <button ref="no" @click.prevent="$modal.hide(modalName)" class="btn btn-sm btn-flat">取消</button>
-      <button @focusout="sureOpen && $refs.no && $refs.no.focus()" @click.prevent="completeDeleteAction" class="btn btn-sm btn-primary">{{this.titleCaseAction}} {{this.dbElement}}</button>
-    </div>
-  </modal>
+    <portal to="modals">
+      <modal :name="modalName" class="beekeeper-modal vue-dialog sure header-sure" @opened="sureOpened" @closed="sureClosed" @before-open="beforeOpened">
+        <div class="dialog-content">
+          <div class="dialog-c-title">真要 {{this.dbAction | titleCase}} <span class="tab-like"><tab-icon :tab="tabIcon" /> {{this.dbElement}}</span>?</div>
+          <p>此更改无法撤消</p>
+        </div>
+        <div class="vue-dialog-buttons">
+          <span class="expand"></span>
+          <button ref="no" @click.prevent="$modal.hide(modalName)" class="btn btn-sm btn-flat">Cancel</button>
+          <button @focusout="sureOpen && $refs.no && $refs.no.focus()" @click.prevent="completeDeleteAction" class="btn btn-sm btn-primary">{{this.titleCaseAction}} {{this.dbElement}}</button>
+        </div>
+      </modal>
+    </portal>
   </div>
 </template>
 
@@ -93,6 +95,7 @@
   import { OpenTab } from '@/common/appdb/models/OpenTab';
   import TabWithTable from './common/TabWithTable.vue';
   import TabIcon from './tab/TabIcon.vue'
+  import { DatabaseEntity } from "@/lib/db/models"
 
   export default Vue.extend({
     props: [ 'connection' ],
@@ -147,7 +150,7 @@
         return _.capitalize(this.dbAction)
       },
       modalName() {
-        return `${this.menuAction}-${this.dbElement}`
+        return "dropTruncateModal"
       },
       tabItems: {
         get() {
@@ -170,7 +173,10 @@
           { event: 'loadRoutineCreate', handler: this.loadRoutineCreate },
           { event: 'favoriteClick', handler: this.favoriteClick },
           { event: 'exportTable', handler: this.openExportModal },
-          { event: AppEvent.dropDatabaseElement, handler: this.dropDatabaseElement }
+          { event: AppEvent.hideEntity, handler: this.hideEntity },
+          { event: AppEvent.hideSchema, handler: this.hideSchema },
+          { event: AppEvent.deleteDatabaseElement, handler: this.deleteDatabaseElement },
+          { event: AppEvent.dropDatabaseElement, handler: this.dropDatabaseElement },
         ]
       },
       contextOptions() {
@@ -202,22 +208,32 @@
     methods: {
       completeDeleteAction() {
         const { schema, name: dbName, entityType } = this.dbDeleteElementParams
+        if (entityType !== 'table' && this.dbAction == 'truncate') {
+          this.$noty.warning("抱歉，您只能截断表。")
+          return;
+        }
         this.$modal.hide(this.modalName)
         this.$nextTick(async() => {
-          if (this.dbAction.toLowerCase() === 'drop') {
-            await this.connection.dropElement(dbName, entityType?.toUpperCase(), schema)
-            // timeout is more about aesthetics so it doesn't refresh the table right away.
+          try {
+            if (this.dbAction.toLowerCase() === 'drop') {
+              await this.connection.dropElement(dbName, entityType?.toUpperCase(), schema)
+              // timeout is more about aesthetics so it doesn't refresh the table right away.
 
-            return setTimeout(() => {
-              this.$store.dispatch('updateTables')
-              this.$store.dispatch('updateRoutines')
-            }, 500)
-          }
+              setTimeout(() => {
+                this.$store.dispatch('updateTables')
+                this.$store.dispatch('updateRoutines')
+              }, 500)
+            }
 
-          if (this.dbAction.toLowerCase() === 'truncate') {
-            await this.connection.truncateElement(dbName, entityType?.toUpperCase(), schema)
+            if (this.dbAction.toLowerCase() === 'truncate') {
+              await this.connection.truncateElement(dbName, entityType?.toUpperCase(), schema)
+            }
+
+            this.$noty.success(`${this.dbAction} 已完成`)
+
+          } catch (ex) {
+            this.$noty.error(`执行错误 ${this.dbAction}: ${ex.message}`)
           }
-          
         })
       },
       beforeOpened() {
@@ -303,22 +319,22 @@
         const stringResult = format(_.isArray(result) ? result[0] : result, { language: FormatterDialect(this.dialect) })
         this.createQuery(stringResult)
       },
-      dropDatabaseElement({ item: dbActionParams, action: dbAction }) { 
+      dropDatabaseElement({ item: dbActionParams, action: dbAction }) {
         this.dbElement = dbActionParams.name
         this.dbAction = dbAction
         this.dbEntityType = dbActionParams.entityType
         this.dbDeleteElementParams = dbActionParams
 
-        this.$nextTick(() => this.$modal.show(this.modalName))
+        this.$modal.show(this.modalName)
       },
       async loadRoutineCreate(routine) {
-        const result = await this.connection.getRoutineCreateScript(routine.name, routine.schema)
+        const result = await this.connection.getRoutineCreateScript(routine.name, routine.type, routine.schema)
         const stringResult = format(_.isArray(result) ? result[0] : result, { language: FormatterDialect(this.dialect) })
         this.createQuery(stringResult)
       },
       openTableBuilder() {
         const tab = new OpenTab('table-builder')
-        tab.title = "新添数据表"
+        tab.title = "新建数据表"
         tab.unsavedChanges = true
         this.addTab(tab)
       },
@@ -327,10 +343,8 @@
         t.tableName = table.name
         t.schemaName = table.schema
         t.title = table.name
-
         const existing = this.tabItems.find((tab) => tab.matches(t))
         if (existing) return this.$store.dispatch('tabs/setActive', existing)
-
         this.addTab(t)
       },
       openTable({ table, filter}) {
@@ -348,6 +362,12 @@
       openExportModal(options) {
         this.tableExportOptions = options
         this.showExportModal = true
+      },
+      hideEntity(entity: DatabaseEntity) {
+        this.$store.dispatch('hideEntities/addEntity', entity)
+      },
+      hideSchema(schema: string) {
+        this.$store.dispatch('hideEntities/addSchema', schema)
       },
       openSettings() {
         const tab = new OpenTab('settings')

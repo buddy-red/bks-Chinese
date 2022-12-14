@@ -10,25 +10,25 @@ export function menuItems(actionHandler: IMenuActionHandler, settings: IGroupedU
   return {
     quit: {
       id: 'quit',
-      label: platformInfo.isMac ? '退出' : '退出',
+      label: platformInfo.isMac ? 'Quit' : 'Exit',
       accelerator: platformInfo.isMac ? 'CommandOrControl+Q' : undefined,
       click: actionHandler.quit
     },
     undo: {
       id: 'undo',
-      label: "撤消",
+      label: "Undo",
       accelerator: "CommandOrControl+Z",
       click: actionHandler.undo
     },
     redo: {
       id: "redo",
-      label: "重做",
+      label: "Redo",
       accelerator: platformInfo.isWindows ? 'Ctrl+Y' : 'Shift+CommandOrControl+Z',
       click: actionHandler.redo
     },
     cut: {
       id: 'cut',
-      label: '剪切',
+      label: 'Cut',
       accelerator: 'CommandOrControl+X',
       click: actionHandler.cut,
       registerAccelerator: false
@@ -36,14 +36,14 @@ export function menuItems(actionHandler: IMenuActionHandler, settings: IGroupedU
     },
     copy: {
       id: 'copy',
-      label: '复制',
+      label: 'Copy',
       accelerator: 'CommandOrControl+C',
       click: actionHandler.copy,
       registerAccelerator: false
     },
     paste: {
       id: 'paste',
-      label: '粘贴',
+      label: 'Paste',
       accelerator: 'CommandOrControl+V',
       click: actionHandler.paste,
       registerAccelerator: false
@@ -51,116 +51,116 @@ export function menuItems(actionHandler: IMenuActionHandler, settings: IGroupedU
 
     selectAll: {
       id: 'select-all',
-      label: '全选',
+      label: 'Select All',
       accelerator: 'CommandOrControl+A',
       click: actionHandler.selectAll
     },
     // view
     zoomreset: {
       id: 'zoom-reset',
-      label: "重置缩放",
+      label: "Reset Zoom",
       accelerator: "CommandOrControl+0",
       click: actionHandler.zoomreset
     },
     zoomin: {
       id: 'zoom-in',
-      label: "放大",
+      label: "Zoom In",
       accelerator: 'CommandOrControl+=',
       click: actionHandler.zoomin
     },
     zoomout: {
       id: 'zoom-out',
-      label: "缩小",
+      label: "Zoom Out",
       accelerator: "CommandOrControl+-",
       click: actionHandler.zoomout
     },
     fullscreen: {
       id: 'fullscreen',
-      label: "切换全屏",
+      label: "Toggle Full Screen",
       accelerator: platformInfo.isMac ? 'Shift+CommandOrControl+F' : 'F11',
       click: actionHandler.fullscreen
     },
     // help
     about: {
       id: 'about',
-      label: '关于 Beekeeper Studio',
+      label: 'About Beekeeper Studio',
       click: actionHandler.about
     },
     devtools: {
       id: 'dev-tools',
-      label: "显示开发工具",
+      label: "Show Developer Tools",
       // @ts-ignore
       nonNativeMacOSRole: true,
       click: actionHandler.devtools
     },
     opendocs : {
       id: 'opendocs',
-      label: '文档与技术支持',
+      label: 'Documentation and Support',
       click: actionHandler.opendocs
     },
     reload: {
       id: 'reload-window',
-      label: "开发强制重载",
+      label: "DEV Force Reload",
       accelerator: "CommandOrControl+Shift+R",
       click: actionHandler.reload
     },
     newWindow: {
       id: 'new-window',
-      label: "打开新窗口",
+      label: "New Window",
       accelerator: "CommandOrControl+Shift+N",
       click: actionHandler.newWindow
     },
     addBeekeeper: {
       id: 'add-beekeeper',
-      label: "添加Beekeeper数据库",
+      label: "Add Beekeeper's Database",
       click: actionHandler.addBeekeeper
     },
     newTab: {
       id: "new-query-menu",
-      label: "打开标签页",
+      label: "New Tab",
       accelerator: "CommandOrControl+T",
       click: actionHandler.newQuery,
     },
     closeTab: {
       id: 'close-tab',
-      label: "关闭标签页",
+      label: "Close Tab",
       accelerator: "CommandOrControl+W",
       click: actionHandler.closeTab,
       registerAccelerator: false
     },
     quickSearch: {
       id: 'go-to',
-      label: "快捷搜索",
+      label: "Quick Search",
       accelerator: "CommandOrControl+P",
       registerAccelerator: false,
       click: actionHandler.quickSearch
     },
     disconnect: {
       id: 'disconnect',
-      label: "断开连接",
+      label: "Disconnect",
       click: actionHandler.disconnect
     },
     sidebarToggle: {
       id: 'menu-toggle-sidebar',
-      label: '切换侧边栏',
+      label: 'Toggle Sidebar',
       accelerator: "Alt+S",
       click: actionHandler.toggleSidebar,
     },
     menuStyleToggle: {
       id: 'menu-style-toggle-menu',
-      label: "菜单风格",
+      label: "Menu Style",
       submenu: [
         {
           id: "ms-native",
           type: 'radio',
-          label: '原生',
+          label: 'Native',
           click: actionHandler.switchMenuStyle,
           checked: settings.menuStyle.value === 'native'
         },
         {
           id: "ms-client",
           type: 'radio',
-          label: '客户端',
+          label: 'Client',
           click: actionHandler.switchMenuStyle,
           checked: settings.menuStyle.value === 'client'
         }
@@ -168,23 +168,23 @@ export function menuItems(actionHandler: IMenuActionHandler, settings: IGroupedU
     },
     themeToggle: {
       id: "theme-toggle-menu",
-      label: "界面主题",
+      label: "Theme",
       submenu: [
         {
           type: 'radio',
-          label: "系统自动设置",
+          label: "System",
           click: actionHandler.switchTheme,
           checked: settings.theme.value === 'system'
         },
         {
           type: "radio",
-          label: "白色",
+          label: "Light",
           click: actionHandler.switchTheme,
           checked: settings.theme.value === 'light'
         },
         {
           type: 'radio',
-          label: "深色",
+          label: "Dark",
           click: actionHandler.switchTheme,
           checked: settings.theme.value === 'dark'
         }

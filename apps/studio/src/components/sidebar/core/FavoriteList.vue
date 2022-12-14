@@ -4,18 +4,18 @@
       <div class="list-group">
         <div class="list-heading row">
           <div class="sub row flex-middle expand">
-            <div class="expand">已保存查询</div>
+            <div class="expand">Saved Queries</div>
             <div class="actions">
               <a v-if="isCloud" title="Import queries from local workspace" @click.prevent="importFromLocal"><i class="material-icons">save_alt</i></a>
               <a class="" @click.prevent="refresh">
-                <i title="刷新已保存查询" class="material-icons">refresh</i>
+                <i title="Refresh Saved Queries" class="material-icons">refresh</i>
               </a>
             </div>
 
           </div>
 
         </div>
-      <error-alert v-if="error" :error="error" title="加载查询有问题" />
+      <error-alert v-if="error" :error="error" title="Problem loading queries" />
       <sidebar-loading v-if="loading" />
       <nav v-else-if="savedQueries.length > 0" class="list-body" ref="wrapper">
         <sidebar-folder
@@ -50,20 +50,21 @@
          />
       </nav>
       <div class="empty" v-else>
-        <span class="empty-title">没有已保存查询</span>
+        <span class="empty-title">No Saved Queries</span>
         <span class="empty-actions" v-if="isCloud">
-          <a class="btn btn-flat btn-block btn-icon" @click.prevent="importFromLocal" title="Import queries from local workspace"><i class="material-icons">save_alt</i> 导入</a>
+          <a class="btn btn-flat btn-block btn-icon" @click.prevent="importFromLocal" title="Import queries from local workspace"><i class="material-icons">save_alt</i> Import</a>
         </span>
       </div>
       </div>
     </div>
-    <modal class="vue-dialog beekeeper-modal" name="rename-modal" @closed="renameMe=null" height="auto" :scrollable="true">
-      <div class="dialog-content" v-if="renameMe">
-        <div class="dialog-c-title">重命名 {{renameMe.title}}</div>
-        <query-rename-form :query="renameMe" @done="$modal.hide('rename-modal')" />
-      </div>
-    </modal>
-
+    <portal to="modals">
+      <modal class="vue-dialog beekeeper-modal" name="rename-modal" @closed="renameMe=null" height="auto" :scrollable="true">
+        <div class="dialog-content" v-if="renameMe">
+          <div class="dialog-c-title">Rename {{renameMe.title}}</div>
+          <query-rename-form :query="renameMe" @done="$modal.hide('rename-modal')" />
+        </div>
+      </modal>
+    </portal>
   </div>
 </template>
 
@@ -118,7 +119,7 @@ import QueryRenameForm from '@/components/common/form/QueryRenameForm.vue'
         })
       },
       removeTitle() {
-        return `移除 ${this.checkedFavorites.length} 保存查询`;
+        return `Remove ${this.checkedFavorites.length} saved queries`;
       }
     },
     methods: {
@@ -153,7 +154,7 @@ import QueryRenameForm from '@/components/common/form/QueryRenameForm.vue'
         this.$root.$emit('favoriteClick', item)
       },
       async remove(favorite) {
-        if (window.confirm("确定删除?")) {
+        if (window.confirm("Really delete?")) {
           await this.$store.dispatch('data/queries/remove', favorite)
         }
       },

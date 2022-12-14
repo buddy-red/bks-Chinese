@@ -8,14 +8,14 @@
       <form @submit.prevent="onSubmit">
         <div class="dialog-content filter-modal">
           <div class="dialog-c-title flex flex-middle">
-            选择显示列
+            选择要显示的列
           </div>
           <span class="close-btn btn btn-fab">
             <i class="material-icons" @click.prevent="closeModal">clear</i>
           </span>
           <div class="modal-form">
             <div class="search-wrapper">
-              <input type="text" placeholder="筛选" v-model="searchQuery"/>
+              <input type="text" placeholder="Filter" v-model="searchQuery"/>
               <span
                 class="clear"
                 @click="searchQuery = ''"

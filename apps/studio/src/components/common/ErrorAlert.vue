@@ -5,7 +5,7 @@
     </a>
     <div class="alert-title">
       <i class="material-icons">error_outline</i>
-      <b class="error-title">{{title || "出问题"}}</b>
+      <b class="error-title">{{title || "出错"}}</b>
     </div>
     <div class="alert-body">
       <ul class="error-list">
@@ -20,9 +20,6 @@
           {{helpText ? ` - ${helpText}` : ''}}
         </li>
       </ul>
-      <div class="help-links" v-if="error.helpLink">
-        <a :href="error.helpLink">详细了解此错误</a>
-      </div>
 
     </div>
   </div>
@@ -42,6 +39,9 @@ export default Vue.extend({
       return result.map((e) => {
         return e.message ? e : { message: e.toString()}
       })
+    },
+    helpLink() {
+      return this.errors.map((e) => e.helpLink).find((e) => e)
     }
   },
   methods: {
@@ -90,6 +90,12 @@ export default Vue.extend({
       }
       i {
         line-height: 28px;
+      }
+      .help-links {
+        margin-top: 1rem;
+        a {
+          padding-left: 0;
+        }
       }
     }
 

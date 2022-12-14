@@ -37,7 +37,7 @@ export default {
       }
       this.exporter.abort();
       this.notification.close();
-      this.$noty.error(`${this.exporter.table.name} export aborted`);
+      this.$noty.error(`${this.exporter.table.name} 导出已终止`);
     },
     updateProgress(progress) {
       this.percentComplete = progress.percentComplete

@@ -8,12 +8,12 @@
       <div class="row gutter">
         <div class="alert alert-info">
           <i class="material-icons-outlined">info</i>
-          <div>要使SSH隧道正常工作，必须在SSH服务器配置中将“允许TCP转向”设置为“是”。</div>
+          <div>要使SSH隧道正常工作，必须在ssh服务器配置中将AllowTcpForwarding设置为“yes”。</div>
         </div>
       </div>
       <div class="row gutter">
         <div class="col s9 form-group">
-          <label for="sshHost">SSH 主机名</label>
+          <label for="sshHost">SSH主机名</label>
           <input type="text" v-model="config.sshHost">
         </div>
         <div class="col s3 form-group">
@@ -23,20 +23,20 @@
       </div>
       <div class="row gutter">
         <div class="col s8 form-group">
-          <label for="bastionHost">堡垒机(跳板机)</label>
+          <label for="bastionHost">堡垒主机(跳板主机)</label>
           <input class="form-control" v-model="config.sshBastionHost" type="text" name="bastionHost">
         </div>
         <div class="col s4 form-group">
           <label for="sshKeepaliveInterval">
-            保持间隔 <i class="material-icons" style="padding-left: 0.25rem"
-            v-tooltip="'闲置几秒钟后Ping服务器 <br />以防止由于不活跃而断开连接<br/> (例如：在ssh/config中配置<code> ServerAliveInterval 60 </code>）'"
+            保活间隔 <i class="material-icons" style="padding-left: 0.25rem"
+            v-tooltip="'闲置多少秒后对服务器发送ping包，以防止因不活跃而断开连接 <br/>(例如：ssh/config 中的<code> ServerAliveInterval 60 </code>)'"
             >help_outlined</i>
           </label>
-          <input type="number" v-model.number="config.sshKeepaliveInterval" name="sshKeepaliveInterval" placeholder="(单位为秒钟)">
+          <input type="number" v-model.number="config.sshKeepaliveInterval" name="sshKeepaliveInterval" placeholder="(in seconds)">
         </div>
       </div>
       <div class="form-group">
-        <label>SSH 验证</label>
+        <label>SSH身份验证</label>
         <select class="form-control" v-model="config.sshMode">
           <option v-for="option in sshModeOptions" :key="option.mode" :value="option.mode">{{option.label}}</option>
         </select>
@@ -44,23 +44,23 @@
 
       <div v-if="config.sshMode === 'agent'" class="agent flex-col">
         <div class="form-group">
-          <label for="sshUsername">SSH 用户名</label>
+          <label for="sshUsername">SSH用户名</label>
           <input class="form-control" type="text" v-model="config.sshUsername">
         </div>
         <div class="alert alert-warning" v-if="$config.isSnap">
           <i class="material-icons">error_outline</i>
           <div>
-            由于Snap应用程序的安全模型，Beekeeper Studio的Snap版本无法进行SSH代理转向。
-            <external-link :href="enableSshLink">更多信息</external-link>
+            由于Snap应用程序的安全模型，本系统的Snap版本无法进行SSH代理转发。
+            <external-link :href="enableSshLink">了解更多</external-link>
           </div>
         </div>
         <div v-else-if="$config.sshAuthSock" class="alert alert-success">
           <i class="material-icons">check</i>
-          <div>我们找到了您的SSH代理。一切正常！</div>
+          <div>我们找到了您的SSH代理。您已就绪!</div>
         </div>
         <div v-else-if="$config.isWindows" class="alert alert-info">
           <i class="material-icons-outlined">info</i>
-          <div>我们没有发现*nix ssh-agent正在运行，所以我们将尝试使用PuTTY代理Pageant。</div>
+          <div>我们没有发现*nix ssh-agent正在运行，所以我们将尝试使用PuTTY代理，即pageant。</div>
         </div>
         <div v-else class="alert alert-warning">
           <i class="material-icons">error_outline</i>
@@ -72,7 +72,7 @@
         <div class="row">
           <div class="col">
             <div class="form-group">
-              <label for="sshUsername">SSH 用户名</label>
+              <label for="sshUsername">SSH用户名</label>
               <input class="form-control" type="text" v-model="config.sshUsername">
             </div>
           </div>
@@ -81,7 +81,7 @@
           <div class="alert alert-warning">
             <i class="material-icons">error_outline</i>
             <div>
-              您好snap用户! 您需要<external-link :href="enableSshLink">先启用SSH访问权</external-link>，然后重启Beekeeper并提供访问您的.ssh目录。
+              嘿，Snap用户！您需要<external-link :href="enableSshLink">启用SSH访问</external-link>，然后重新启动本系统以提供对您的.ssh目录的访问。
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@
             </file-picker>
           </div>
           <div class="col s6 form-group">
-            <label for="sshKeyfilePassword">密钥文件密码<span class="hint">(选填)</span></label>
+            <label for="sshKeyfilePassword">私钥文件密码<span class="hint">(选填)</span></label>
             <input type="password" class="form-control" v-model="config.sshKeyfilePassword">
           </div>
         </div>
@@ -105,13 +105,13 @@
       <div v-if="config.sshMode === 'userpass'" class="row gutter">
         <div class="col s6">
           <div class="form-group">
-            <label for="sshUsername">SSH 用户名</label>
+            <label for="sshUsername">SSH用户名</label>
             <input class="form-control" type="text" v-model="config.sshUsername">
           </div>
         </div>
         <div class="col s6">
           <div class="form-group">
-            <label for="sshPassword">SSH 密码</label>
+            <label for="sshPassword">SSH密码</label>
             <input class="form-control" type="password" v-model="config.sshPassword">
           </div>
         </div>
@@ -134,11 +134,11 @@
     },
     data() {
       return {
-        enableSshLink: "https://docs.beekeeperstudio.io/installation/#ssh-key-access-for-the-snap",
+        enableSshLink: "https://github.com/buddy-red/bks-Chinese",
         sshModeOptions: [
-          { label: "密钥文件", mode: 'keyfile' },
+          { label: "私钥文件", mode: 'keyfile' },
           { label: "用户名 & 密码", mode: "userpass" },
-          { label: "SSH 代理", mode: "agent" }
+          { label: "SSH代理", mode: "agent" }
         ],
         filePickerDefaultPath: pathJoin(remote.app.getPath('home'), '.ssh')
       }

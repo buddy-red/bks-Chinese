@@ -1,5 +1,5 @@
 <template>
-  <div class="schema-wrapper">
+  <div class="schema-wrapper" @contextmenu="$emit('contextmenu', $event)">
     <div class="folder-group schema" v-if="!skipDisplay">
       <a class="folder-btn" :class="{'open': expanded}" role="button" @click.prevent="manuallyExpanded = !manuallyExpanded">
         <span class="btn-fab open-close" >
@@ -16,7 +16,7 @@
           <template v-if="$slots.placeholder">
             <slot name="placeholder"></slot>
           </template>
-          <div v-else class="list-item empty">{{placeholder || "No items"}}</div>
+          <div v-else class="list-item empty">{{placeholder || "无项目"}}</div>
         </template>
       </div>
     </div>

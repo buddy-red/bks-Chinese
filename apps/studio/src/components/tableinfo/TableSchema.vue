@@ -12,17 +12,21 @@
 
         <div class="table-subheader">
           <div class="table-title">
-            <h2>Columns</h2>
+            <h2>数据列</h2>
           </div>
           <slot />
           <span class="expand"></span>
           <div class="actions">
-            <a @click.prevent="refreshColumns" v-tooltip="`${ctrlOrCmd('r')} 或 F5`" class="btn btn-link btn-fab"><i class="material-icons">refresh</i></a>
+            <a @click.prevent="refreshColumns" v-tooltip="`${ctrlOrCmd('r')} or F5`" class="btn btn-link btn-fab"><i class="material-icons">refresh</i></a>
             <a v-if="editable" v-tooltip="ctrlOrCmd('n')" @click.prevent="addRow" class="btn btn-primary btn-fab"><i class="material-icons">add</i></a>
           </div>
         </div>
         <div ref="tableSchema"></div>
-
+        <!-- Tabulator can be slow to open especially for some really large column counts. Let the user know. -->
+        <div v-if="this.table.columns.length" class="columns-loading-disclaimer">
+          <p>数据列加载</p>
+          <p>这可能需要几分钟，具体取决于列数。</p>
+        </div>
       </div>
     </div>
 
@@ -57,6 +61,20 @@
     </status-bar>
   </div>
 </template>
+
+<style scoped>
+  .columns-loading-disclaimer {
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+
+  }
+  .tabulator + .columns-loading-disclaimer {
+    display: none;
+  }
+</style>
+
 <script lang="ts">
 import { TabulatorFull, Tabulator } from 'tabulator-tables'
 type CellComponent = Tabulator.CellComponent
@@ -150,10 +168,9 @@ export default Vue.extend({
         showListOnEmpty: true
       }
 
-
       const result = [
         {
-          title: '名称',
+          title: 'Name',
           field: 'columnName',
           editor: vueEditor(NullableInputEditorVue),
           cellEdited: this.cellEdited,
@@ -162,7 +179,7 @@ export default Vue.extend({
           editable: this.isCellEditable.bind(this, 'renameColumn')
         },
         {
-          title: '类型',
+          title: 'Type',
           field: 'dataType',
           editor: 'autocomplete',
           editorParams: autocompleteOptions,
@@ -172,7 +189,7 @@ export default Vue.extend({
         {
           title: 'Nullable',
           field: 'nullable',
-          headerTooltip: "Allow this column to contain a null value",
+          headerTooltip: "允许此列包含空值",
           editor: vueEditor(CheckboxEditorVue),
           formatter: vueFormatter(CheckboxFormatterVue),
           formatterParams: {
@@ -184,7 +201,7 @@ export default Vue.extend({
           cssClass: "no-padding no-edit-highlight",
         },
         {
-          title: '默认值',
+          title: 'Default Value',
           field: 'defaultValue',
           editor: vueEditor(NullableInputEditorVue),
           headerTooltip: "Be sure to 'quote' string values.",
@@ -249,13 +266,13 @@ export default Vue.extend({
     },
     async refreshColumns() {
       if(this.hasEdits) {
-        if (!window.confirm("你确定吗？您将丢失未保存的更改")) {
+        if (!window.confirm("你确定吗？ 您将丢失未保存的更改")) {
           return
         }
       }
       this.submitUndo()
       this.error = null;
-      await this.$store.dispatch('updateTableColumns', this.table)
+      await this.$emit('refresh')
     },
     collectChanges(): AlterTableSpec {
 
@@ -298,7 +315,7 @@ export default Vue.extend({
         this.$nextTick(() => {
           this.initializeTabulator()
         })
-        this.$noty.success(`${this.table.name} 已更新`)
+        this.$noty.success(`${this.table.name} Updated`)
       } catch(ex) {
         this.error = ex
         console.error(ex)
@@ -331,7 +348,7 @@ export default Vue.extend({
     // table edit callbacks
     async addRow(): Promise<void> {
       if (this.disabledFeatures?.alter?.addColumn) {
-        this.$noty.info(`${this.dialect} 不支持添加列`)
+        this.$noty.info(`${this.dialect}不支持添加列`)
       }
       const data = this.tabulator.getData()
       const name = `column_${data.length + 1}`
@@ -352,7 +369,7 @@ export default Vue.extend({
         this.removedRows = _.without(this.removedRows, row)
       } else {
         if (this.disabledFeatures?.alter?.dropColumn) {
-          this.$noty.info(`${this.dialect} 不支持添加列`)
+          this.$noty.info(`${this.dialect}不支持添加列`)
           return
         }
         this.removedRows.push(row)
@@ -378,6 +395,7 @@ export default Vue.extend({
     },
     initializeTabulator() {
       if (this.tabulator) this.tabulator.destroy()
+      // TODO: a loader would be so cool for tabulator for those gnarly column count tables that people might create...
       // @ts-ignore
       this.tabulator = new TabulatorFull(this.$refs.tableSchema, {
         columns: this.tableColumns,
@@ -389,14 +407,13 @@ export default Vue.extend({
           headerSort: false,
         },
         data: this.tableData,
-        placeholder: "无数据列",
+        placeholder: "无列",
       })
-
     }
   },
-  mounted() {
+  async mounted() {
     this.tabState.dirty = false
-    // const columnWidth = this.table.columns.length > 20 ? 125 : undefined
+    // table columns are updated by TabTableProperties on load. So no need to do it here.
     if (!this.active) this.forceRedraw = true
     this.initializeTabulator()
   },

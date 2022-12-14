@@ -2,12 +2,12 @@
   <div class="with-connection-type">
     <common-server-inputs :config="config">
     <div class="advanced-connection-settings">
-      <h4 class="advanced-heading">SQL Server 选项</h4>
+      <h4 class="advanced-heading">SQL Server选项</h4>
       <div class="advanced-body">
         <div class="form-group">
           <label for="domain">
-            数据域
-            <i class="material-icons" v-tooltip="'将“数据域”设置为使用Windows集成身份验证(NTLM)登录'">help_outlined</i>
+            域名
+            <i class="material-icons" v-tooltip="'将“域名”设置为使用Windows集成身份验证(NTLM)登录'">help_outlined</i>
             </label>
           <input type="text" v-model="config.domain" class="form-control">
         </div>
@@ -15,7 +15,7 @@
           <label for="trustServerCertificate" class="checkbox-group">
             <input type="checkbox" name="trustServerCertificate" v-model="config.trustServerCertificate" id="trustServerCertificate">
             信任服务器证书?
-            <i class="material-icons" v-tooltip="'将此用于本地开发服务器和自签证书。ssl -> 如果启用了 ssl，rejectUnauthorized会覆盖此设置。'">help_outlined</i>
+            <i class="material-icons" v-tooltip="'将其用于本地开发服务器和自签名证书 ssl -> rejectUnauthorized如果启用ssl，则覆盖此设置。'">help_outlined</i>
           </label>
         </div>
 

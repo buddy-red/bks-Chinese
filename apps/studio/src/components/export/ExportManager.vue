@@ -85,7 +85,7 @@ export default Vue.extend({
         exporter.onProgress(this.notifyProgress.bind(this))
         await exporter.exportToFile()
         if (exporter.status !== ExportStatus.Completed) return;
-        const n = this.$noty.success(`导出 ${options.table.name} 完成`, {
+        const n = this.$noty.success(`完成导出 ${options.table.name}`, {
           buttons: [
             Noty.button('显示', "btn btn-primary", () => {
               this.$native.files.showItemInFolder(options.filePath)

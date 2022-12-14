@@ -6,7 +6,7 @@
         CockroachDB云服务集群ID
         <i
           class="material-icons"
-          v-tooltip="`转向线上CockroachDB -> 连接 -> 仅参数 -> 复制自 '选项'`"
+          v-tooltip="`转向线上CockroachDB -> 连接 -> 仅参数 -> 复制自'选项'`"
           >help_outlined</i>
       </label>
       <input type="text" class="form-control" v-model="config.options.cluster">

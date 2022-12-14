@@ -13,7 +13,7 @@
               type="button"
               class="btn btn-flat btn-fab"
               :class="{'btn-primary': !allColumnsSelected}"
-              :title="`Set column visibility (${hiddenColumnCount} hidden)`"
+              :title="`设置列可见(${hiddenColumnCount} 隐藏)`"
               @click="showColumnFilterModal()"
             >
               <i class="material-icons-outlined">visibility</i>
@@ -21,7 +21,7 @@
           </div>
           <div v-if="filterMode === 'raw'" class="filter-group row gutter expand">
             <div class="btn-wrap">
-              <button class="btn btn-flat btn-fab" type="button" @click.stop="changeFilterMode('builder')" title="Toggle Filter Type">
+              <button class="btn btn-flat btn-fab" type="button" @click.stop="changeFilterMode('builder')" title="切换筛选类型">
                 <i class="material-icons-outlined">filter_alt</i>
               </button>
             </div>
@@ -44,20 +44,20 @@
               </div>
             </div>
             <div class="btn-wrap">
-              <button class="btn btn-primary btn-fab" type="submit" title="Filter">
+              <button class="btn btn-primary btn-fab" type="submit" title="筛选">
                 <i class="material-icons">search</i>
               </button>
             </div>
           </div>
           <div v-else-if="filterMode === 'builder'" class="filter-group row gutter expand">
             <div class="btn-wrap">
-              <button class="btn btn-flat btn-fab" type="button" @click.stop="changeFilterMode('raw')" title="Toggle Filter Type">
+              <button class="btn btn-flat btn-fab" type="button" @click.stop="changeFilterMode('raw')" title="切换筛选类型">
                 <i class="material-icons">code</i>
               </button>
             </div>
             <div>
               <div class="select-wrap" >
-                <select name="Filter Field" class="form-control" v-model="filter.field">
+                <select name="筛选字段" class="form-control" v-model="filter.field">
                   <option
                     v-for="column in table.columns"
                     v-bind:key="column.columnName"
@@ -68,7 +68,7 @@
             </div>
             <div>
               <div class="select-wrap">
-                <select name="Filter Type" class="form-control" v-model="filter.type">
+                <select name="筛选类型" class="form-control" v-model="filter.type">
                   <option v-for="(v, k) in filterTypes" v-bind:key="k" :value="v">{{k}}</option>
                 </select>
               </div>
@@ -92,7 +92,7 @@
               </div>
             </div>
             <div class="btn-wrap">
-              <button class="btn btn-primary btn-fab" type="submit" title="Filter">
+              <button class="btn btn-primary btn-fab" type="submit" title="筛选">
                 <i class="material-icons">search</i>
               </button>
             </div>
@@ -115,12 +115,8 @@
           结构 <i class="material-icons">north_east</i>
         </x-button>
         <!-- Info -->
-        <span class="statusbar-item" :title="loadingLength ? 'Loading Total Records' : `Approximately ${totalRecordsText} Records`">
-          <i class="material-icons">list_alt</i>
-          <span v-if="loadingLength">加载中...</span>
-          <span v-else>{{ totalRecordsText }}</span>
-        </span>
-        <a @click="refreshTable" tabindex="0" role="button" class="statusbar-item hoverable" v-if="lastUpdatedText && !error" :title="'Updated' + ' ' + lastUpdatedText">
+        <table-length :table="table" :connection="connection" />
+        <a @click="refreshTable" tabindex="0" role="button" class="statusbar-item hoverable" v-if="lastUpdatedText && !error" :title="'已更新' + ' ' + lastUpdatedText">
           <i class="material-icons">update</i>
           <span>{{lastUpdatedText}}</span>
         </a>
@@ -163,10 +159,10 @@
         </template>
 
         <!-- Actions -->
-        <x-button v-tooltip="`${ctrlOrCmd('r')} 或 F5`" class="btn btn-flat" title="刷新数据表" @click="refreshTable">
+        <x-button v-tooltip="`${ctrlOrCmd('r')} or F5`" class="btn btn-flat" title="Refresh table" @click="refreshTable">
           <i class="material-icons">refresh</i>
         </x-button>
-        <x-button class="btn btn-flat" v-tooltip="ctrlOrCmd('n')" title="添加数据行" @click.prevent="cellAddRow">
+        <x-button class="btn btn-flat" v-tooltip="ctrlOrCmd('n')" title="添加行" @click.prevent="cellAddRow">
           <i class="material-icons">add</i>
         </x-button>
         <x-button class="actions-btn btn btn-flat" title="actions">
@@ -178,7 +174,7 @@
             </x-menuitem>
 
             <x-menuitem @click="exportFiltered">
-              <x-label>导出筛选浏览</x-label>
+              <x-label>导出筛选</x-label>
             </x-menuitem>
           </x-menu>
         </x-button>
@@ -214,29 +210,31 @@ import globals from '@/common/globals';
 import {AppEvent} from '../../common/AppEvent';
 import { vueEditor } from '@shared/lib/tabulator/helpers';
 import NullableInputEditorVue from '@shared/components/tabulator/NullableInputEditor.vue';
+import TableLength from '@/components/common/TableLength.vue'
 import { mapGetters, mapState } from 'vuex';
 import { Tabulator } from 'tabulator-tables'
 import { TableUpdate } from '@/lib/db/models';
 import { markdownTable } from 'markdown-table'
+import { dialectFor } from '@shared/lib/dialects/models'
 const log = rawLog.scope('TableTable')
 const FILTER_MODE_BUILDER = 'builder'
 const FILTER_MODE_RAW = 'raw'
 
 export default Vue.extend({
-  components: { Statusbar, ColumnFilterModal },
+  components: { Statusbar, ColumnFilterModal, TableLength },
   mixins: [data_converter, DataMutators],
   props: ["connection", "initialFilter", "active", 'tab', 'table'],
   data() {
     return {
       filterTypes: {
-        "等于": "=",
-        "不等于": "!=",
-        "类似": "like",
-        "小于": "<",
-        "小于或等于": "<=",
-        "大于": ">",
-        "大于或等于": ">=",
-        "于": "in"
+        equals: "=",
+        "does not equal": "!=",
+        like: "like",
+        "less than": "<",
+        "less than or equal": "<=",
+        "greater than": ">",
+        "greater than or equal": ">=",
+        in: "in"
       },
       filter: {
         value: null,
@@ -253,8 +251,8 @@ export default Vue.extend({
 
       // table data
       data: null, // array of data
-      totalRecords: null,
       preLoadScrollPosition: null,
+      columnWidths: null,
       //
       response: null,
       limit: 100,
@@ -282,11 +280,8 @@ export default Vue.extend({
     };
   },
   computed: {
-    ...mapState(['tables', 'tablesInitialLoaded', 'usedConfig', 'database']),
+    ...mapState(['tables', 'tablesInitialLoaded', 'usedConfig', 'database', 'workspaceId']),
     ...mapGetters(['dialectData']),
-    loadingLength() {
-      return this.totalRecords === null
-    },
     columnsWithFilterAndOrder() {
       if (!this.tabulator || !this.table) return []
       const cols = this.tabulator.getColumns()
@@ -320,7 +315,7 @@ export default Vue.extend({
       if (this.saveError) {
         result.push(`${this.saveError.title} -`)
       }
-      result.push(`${this.pendingChangesCount} 待更改`)
+      result.push(`${this.pendingChangesCount} pending changes`)
       return result.join(" ")
     },
     keymap() {
@@ -336,9 +331,68 @@ export default Vue.extend({
       result[this.ctrlOrCmd('c')] = this.copyCell
       return result
     },
+    headerContextMenu() {
+      return [
+        {
+          label: '<x-menuitem><x-label>调整所有列的大小以匹配</x-label></x-menuitem>',
+          action: (_e, column: Tabulator.ColumnComponent) => {
+            try {
+              this.tabulator.blockRedraw()
+              const columns = this.tabulator.getColumns()
+              columns.forEach((col) => {
+                col.setWidth(column.getWidth())
+              })
+            } catch (error) {
+              console.error(error)
+            } finally {
+              this.tabulator.restoreRedraw()
+            }
+          }
+        },
+        {
+        label: '<x-menuitem><x-label>调整所有列的大小以适应内容</x-label></x-menuitem>',
+        action: (_e, _column: Tabulator.ColumnComponent) => {
+          try {
+            this.tabulator.blockRedraw()
+            const columns = this.tabulator.getColumns()
+            columns.forEach((col) => {
+              col.setWidth(true)
+            })
+          } catch (error) {
+            console.error(error)
+          } finally {
+            this.tabulator.restoreRedraw()
+          }
+        }
+      },
+        {
+        label: '<x-menuitem><x-label>将所有列的大小调整为固定宽度</x-label></x-menuitem>',
+        action: (_e, _column: Tabulator.ColumnComponent) => {
+          try {
+            this.tabulator.blockRedraw()
+            const columns = this.tabulator.getColumns()
+            columns.forEach((col) => {
+              col.setWidth(200)
+            })
+            // const layout = this.tabulator.getColumns().map((c: CC) => ({
+            //   field: c.getField(),
+            //   width: c.getWidth(),
+            // }))
+            // this.tabulator.setColumnLayout(layout)
+            // this.tabulator.redraw(true)
+          } catch (error) {
+            console.error(error)
+          } finally {
+            this.tabulator.restoreRedraw()
+          }
+        }
+      }
+
+      ]
+    },
     cellContextMenu() {
       return [{
-          label: '<x-menuitem><x-label>设置Null</x-label></x-menuitem>',
+          label: '<x-menuitem><x-label>设置为空</x-label></x-menuitem>',
           action: (_e, cell: Tabulator.CellComponent) => {
             if (this.isPrimaryKey(cell.getField())) {
               // do nothing
@@ -388,9 +442,7 @@ export default Vue.extend({
         {
           label: '<x-menuitem><x-label>复制行(插入)</x-label></x-menuitem>',
           action: async (_e, cell) => {
-
             const fixed = this.$bks.cleanData(this.modifyRowData(cell.getRow().getData()), this.tableColumns)
-
             const tableInsert = {
               table: this.table.name,
               schema: this.table.schema,
@@ -414,7 +466,7 @@ export default Vue.extend({
       ]
     },
     filterPlaceholder() {
-      return `输入条件，例如：名称 'Matthew%'`
+      return `输入条件，例如: 名称 'Matthew%'`
     },
     tableHolder() {
       return this.$el.querySelector('.tabulator-tableholder')
@@ -426,10 +478,7 @@ export default Vue.extend({
       return this.columnsWithFilterAndOrder.filter((c) => !c.filter).length
     },
     builderPlaceholder() {
-      return this.filter.type === 'in' ? `请输入值并用逗号隔开，例如：foo,bar` : '输入值'
-    },
-    totalRecordsText() {
-      return `~${this.totalRecords.toLocaleString()}`
+      return this.filter.type === 'in' ? `输入以逗号分隔的值，例如: foo,bar` : '输入值'
     },
     pendingChangesCount() {
       return this.pendingChanges.inserts.length
@@ -455,7 +504,7 @@ export default Vue.extend({
     },
     readOnlyNotice() {
       return this.dialectData.notices?.tableTable ||
-        "仅具有单个主键列的表可编辑"
+        "只有具有单个primary key列的表是可编辑"
     },
     // it's a table, but there's no primary key
     missingPrimaryKey() {
@@ -473,6 +522,11 @@ export default Vue.extend({
         result[item.fromColumn].push(item);
       })
       return result
+    },
+    // we can use this to track if column names have been updated and we need
+    // to refresh
+    tableColumnNames() {
+      return this.table?.columns.map((c) => c.columnName).join("-")
     },
     tableColumns() {
       const keyWidth = 40
@@ -494,11 +548,7 @@ export default Vue.extend({
         const isPK = this.primaryKeys?.length && this.isPrimaryKey(column.columnName)
         const columnWidth = this.table.columns.length > 30 ?
           this.defaultColumnWidth(slimDataType, globals.bigTableColumnWidth) :
-          undefined
-
-        const formatter = () => {
-          return `<span class="tabletable-title">${escapeHtml(column.columnName)} <span class="badge">${escapeHtml(slimDataType)}</span></span>`
-        }
+          undefined;
 
         let headerTooltip = `${column.columnName} ${column.dataType}`
         if (keyDatas && keyDatas.length > 0) {
@@ -513,19 +563,25 @@ export default Vue.extend({
         const result = {
           title: column.columnName,
           field: column.columnName,
-          titleFormatter: formatter,
-          mutatorData: this.resolveTabulatorMutator(column.dataType),
+          titleFormatter: this.headerFormatter,
+          titleFormatterParams: {
+            columnName: column.columnName,
+            dataType: column.dataType
+          },
+          mutatorData: this.resolveTabulatorMutator(column.dataType, dialectFor(this.connection.connectionType)),
           dataType: column.dataType,
           cellClick: this.cellClick,
+          minWidth: globals.minColumnWidth,
           width: columnWidth,
           maxWidth: globals.maxColumnWidth,
           maxInitialWidth: globals.maxInitialWidth,
           cssClass: isPK ? 'primary-key' : '',
           editable: this.cellEditCheck,
-          headerSort: this.allowHeaderSort(column),
+          headerSort: true,
           editor: editorType,
           tooltip: true,
           contextMenu: this.cellContextMenu,
+          headerContextMenu: this.headerContextMenu,
           variableHeight: true,
           headerTooltip: headerTooltip,
           cellEditCancelled: cell => cell.getRow().normalizeHeight(),
@@ -546,9 +602,9 @@ export default Vue.extend({
           const icon = () => "<i class='material-icons fk-link'>launch</i>"
           const tooltip = () => {
             if (keyDatas.length == 1)
-              return `浏览记录于 ${keyDatas[0].toTable}`
+              return `查看记录于 ${keyDatas[0].toTable}`
             else
-              return `浏览记录于 ${(keyDatas.map(item => item.toTable).join(', ') as string).replace(/, (?![\s\S]*, )/, ', or ')}`
+              return `查看记录于 ${(keyDatas.map(item => item.toTable).join(', ') as string).replace(/, (?![\s\S]*, )/, ', or ')}`
           }
           let clickMenu = null;
           if (keyDatas.length > 1) {
@@ -606,9 +662,10 @@ export default Vue.extend({
     tableId() {
       // the id for a tabulator table
       if (!this.usedConfig.id) return null;
-      return `${this.usedConfig.id}.${this.database || 'none'}.${this.table.schema || 'none'}.${this.table.name}`
+      return `workspace-${this.workspaceId}.connection-${this.usedConfig.id}.db-${this.database || 'none'}.schema-${this.table.schema || 'none'}.table-${this.table.name}`
     },
     persistenceOptions() {
+      // return {}
       if (!this.tableId) return {}
 
       return {
@@ -616,7 +673,8 @@ export default Vue.extend({
           sort: false,
           filter: false,
           group: false,
-          columns: ['width', 'visible'],
+          columns: ['visible', 'width'],
+
         },
         persistenceMode: 'local',
         persistenceID: this.tableId,
@@ -646,6 +704,10 @@ export default Vue.extend({
       }
     },
     initialSort() {
+      // FIXME: Don't specify an initial sort order
+      // because it can slow down some databases.
+      // However - some databases require an 'order by' for limit, so needs some
+      // integration tests first.
       if (!this.table?.columns?.length) {
         return [];
       }
@@ -684,19 +746,13 @@ export default Vue.extend({
         this.tabulator.blockRedraw()
       }
     },
-    table: {
-      deep: true,
-      async handler() {
-        log.debug('table changed', this.tableColumns)
-        if(!this.tabulator) {
-          return
-        }
-        if (!this.active) {
-          this.forceRedraw = true
-        }
-        await this.tabulator.setColumns(this.tableColumns)
-        await this.refreshTable()
-      }
+    async tableColumnNames() {
+      if (!this.tabulator) return;
+
+      if (!this.active) this.forceRedraw = true;
+      console.log("setting columns")
+      await this.tabulator.setColumns(this.tableColumns)
+      await this.refreshTable();
     },
     filterValue() {
       if (this.filter.value === "") {
@@ -750,7 +806,29 @@ export default Vue.extend({
     }
   },
   methods: {
-    maybeScroll() {
+    headerFormatter(_cell, formatterParams) {
+      const { columnName, dataType } = formatterParams
+      return `
+        <span class="tabletable-title">
+          ${escapeHtml(columnName)}
+          <span class="badge">${dataType}</span>
+        </span>`
+    },
+    maybeScrollAndSetWidths() {
+      if (this.columnWidths) {
+        try {
+          this.tabulator.blockRedraw()
+          this.columnWidths.forEach(({ field, width}) => {
+            const col = this.tabulator.getColumn(field)
+            if (col) col.setWidth(width)
+          })
+          this.columnWidths = null
+        } catch (ex) {
+          console.error("error setting widths", ex)
+        } finally {
+          this.tabulator.restoreRedraw()
+        }
+      }
       if (this.preLoadScrollPosition) {
         this.tableHolder.scrollLeft = this.preLoadScrollPosition
         this.preLoadScrollPosition = null
@@ -773,25 +851,16 @@ export default Vue.extend({
       return this.primaryKeys.includes(column);
     },
     async initialize() {
-      log.info("initializing tab ", this.tab.title, this.tab.tabType)
       this.initialized = true
       this.filter.field = this.table?.columns[0]?.columnName
       if (this.initialFilter) {
         this.filter = _.clone(this.initialFilter)
       }
-      this.fetchTableLength()
       this.resetPendingChanges()
       await this.$store.dispatch('updateTableColumns', this.table)
       this.rawTableKeys = await this.connection.getTableKeys(this.table.name, this.table.schema)
       const rawPrimaryKeys = await this.connection.getPrimaryKeys(this.table.name, this.table.schema);
       this.primaryKeys = rawPrimaryKeys.map((key) => key.columnName);
-      // this.columnsWithFilterAndOrder = this.table.columns.map(({columnName, dataType}) => ({
-      //   name: columnName,
-      //   dataType,
-      //   filter: true,
-      //   order: 0,
-      // }))
-
 
 
       // @ts-ignore-error
@@ -804,7 +873,7 @@ export default Vue.extend({
         ajaxURL: "http://fake",
         sortMode: 'remote',
         filterMode: 'remote',
-        dataLoaderError: `<span style="display:inline-block">加载数据时出错，请参阅以下错误</span>`,
+        dataLoaderError: `<span style="display:inline-block">加载数据时出错，请参阅下面的错误</span>`,
         pagination: true,
         paginationMode: 'remote',
         paginationSize: this.limit,
@@ -828,23 +897,13 @@ export default Vue.extend({
         ]
       });
       this.tabulator.on('cellEdited', this.cellEdited)
-      this.tabulator.on('dataProcessed', this.maybeScroll)
+      this.tabulator.on('dataProcessed', this.maybeScrollAndSetWidths)
 
       this.$nextTick(() => {
         if (this.$refs.valueInput) {
           this.$refs.valueInput.focus()
         }
       })
-    },
-    async fetchTableLength() {
-      try {
-        if (!this.table) return;
-        const length = await this.connection.getTableLength(this.table.name, this.table.schema)
-        this.totalRecords = length
-      } catch(ex) {
-        console.error("无法获得表格长度", ex)
-        this.totalRecords = 0
-      }
     },
     openProperties() {
       this.$root.$emit(AppEvent.openTableProperties, { table: this.table })
@@ -872,7 +931,7 @@ export default Vue.extend({
       return inserts
     },
     defaultColumnWidth(slimType, defaultValue) {
-      const chunkyTypes = ['json', 'jsonb', 'blob', 'text', '_text']
+      const chunkyTypes = ['json', 'jsonb', 'blob', 'text', '_text', 'tsvector']
       if (chunkyTypes.includes(slimType)) return globals.largeFieldWidth
       return defaultValue
     },
@@ -912,8 +971,8 @@ export default Vue.extend({
 
       const keyDatas = this.tableKeys[fromColumn]
       if (!keyDatas || keyDatas.length === 0) {
-        log.error("fk-click, 找不到关键数据。 请打开发起issue。 fromColumn:", fromColumn)
-        this.$noty.error("无法打开外键，请参阅开发控制台")
+        log.error("fk-click, couldn't find key data. Please open an issue. fromColumn:", fromColumn)
+        this.$noty.error("无法打开foreign key。查看开发控制台")
       }
       const keyData = toColumn == null || toTable == null ? keyDatas[0] : keyDatas.find(x => x.toTable === toTable && x.toColumn === toColumn);
 
@@ -923,7 +982,7 @@ export default Vue.extend({
         return (!schemaName || schemaName === t.schema) && t.name === tableName
       })
       if (!table) {
-        log.error("fk-click: 找不到目标表", tableName)
+        log.error("fk-click: unable to find destination table", tableName)
         return
       }
       const filter = {
@@ -984,7 +1043,7 @@ export default Vue.extend({
       const pkCells = cell.getRow().getCells().filter(c => this.isPrimaryKey(c.getField()))
 
       if (!pkCells) {
-        this.$noty.error("无法编辑列 - 无法确定主键")
+        this.$noty.error("无法编辑列——无法确定primary key")
         // cell.setValue(cell.getOldValue())
         cell.restoreOldValue()
         return
@@ -1075,7 +1134,7 @@ export default Vue.extend({
       const pkCells = row.getCells().filter(c => this.isPrimaryKey(c.getField()))
 
       if (!pkCells) {
-        this.$noty.error("无法删除行 - 无法确定主键")
+        this.$noty.error("无法删除行——无法找出primary key")
         return
       }
 
@@ -1157,7 +1216,7 @@ export default Vue.extend({
 
           if (replaceData) {
             const niceChanges = pluralize('change', this.pendingChangesCount, true)
-            this.$noty.success(`${niceChanges} 已应用`)
+            this.$noty.success(`${niceChanges} successfully applied`)
             this.tabulator.replaceData()
           }
 
@@ -1277,7 +1336,7 @@ export default Vue.extend({
               selects,
             );
             if (_.xor(response.fields, this.table.columns.map(c => c.columnName)).length > 0) {
-              log.debug('表已更改，正在更新')
+              log.debug('table has changed, updating')
               await this.$store.dispatch('updateTableColumns', this.table)
             }
 
@@ -1296,6 +1355,9 @@ export default Vue.extend({
             this.data = Object.freeze(data)
             this.lastUpdated = Date.now()
             this.preLoadScrollPosition = this.tableHolder.scrollLeft
+            this.columnWidths = this.tabulator.getColumns().map((c) => {
+              return { field: c.getField(), width: c.getWidth()}
+            })
             resolve({
               last_page: 1,
               data
@@ -1334,7 +1396,6 @@ export default Vue.extend({
     async refreshTable() {
       log.debug('refreshing table')
       const page = this.tabulator.getPage()
-      this.fetchTableLength()
       await this.tabulator.replaceData()
       this.tabulator.setPage(page)
       if (!this.active) this.forceRedraw = true

@@ -143,7 +143,7 @@ export default async function (server: any, database: any): Promise<DatabaseClie
   };
 
   logger().debug('connected');
-  const defaultSchema = await getSchema(conn);
+  const defaultSchema: string = await getSchema(conn);
   logger().debug(`loaded schema ${defaultSchema}`)
   dataTypes = await getTypes(conn)
 
@@ -158,6 +158,7 @@ export default async function (server: any, database: any): Promise<DatabaseClie
     supportedFeatures: () => features,
     versionString: () => getVersionString(version),
     wrapIdentifier,
+    defaultSchema: () => defaultSchema,
     disconnect: () => disconnect(conn),
     listTables: (_db: string, filter: FilterOptions | undefined) => listTables(conn, filter),
     listViews: (filter?: FilterOptions) => listViews(conn, filter),
@@ -186,6 +187,12 @@ export default async function (server: any, database: any): Promise<DatabaseClie
     getRoutineCreateScript: (routine, type, schema = defaultSchema) => getRoutineCreateScript(conn, routine, type, schema),
     truncateAllTables: (_, schema = defaultSchema) => truncateAllTables(conn, schema),
     getTableProperties: (table, schema = defaultSchema) => getTableProperties(conn, table, schema),
+
+    // db creation
+    listCharsets: async() => PD.charsets,
+    getDefaultCharset: async() => 'UTF8',
+    listCollations: async() => [],
+    createDatabase: (databaseName, charset) => createDatabase(conn, databaseName, charset),
 
     // alter tables
     alterTableSql: (change: AlterTableSpec) => alterTableSql(conn, change),
@@ -1192,7 +1199,8 @@ export async function listDatabases(conn: Conn, filter?: DatabaseFilterOptions) 
 
 export async function getInsertQuery(conn: HasPool, database: string, tableInsert: TableInsert): Promise<string> {
   const columns = await listTableColumns(conn, database, tableInsert.table, tableInsert.schema)
-  return buildInsertQuery(knex, tableInsert, columns)
+
+  return buildInsertQuery(knex, tableInsert, columns, _.toString)
 }
 
 export function getQuerySelectTop(_conn: Conn, table: string, limit: number, schema: string) {
@@ -1357,6 +1365,20 @@ export async function dropElement (conn: Conn, elementName: string, typeOfElemen
 
     await driverExecuteSingle(connClient, { query: sql })
   });
+}
+
+export async function createDatabase(conn, databaseName, charset) {
+  const {isPostgres, number: versionAsInteger } = await getVersion(conn)
+
+  let sql = `create database ${wrapIdentifier(databaseName)} encoding ${wrapIdentifier(charset)}`;
+
+  // postgres 9 seems to freak out if the charset isn't wrapped in single quotes and also requires the template https://www.postgresql.org/docs/9.3/sql-createdatabase.html
+  // later version don't seem to care
+  if (isPostgres && versionAsInteger < 100000) {
+    sql = `create database ${wrapIdentifier(databaseName)} encoding '${charset}' template template0`;
+  }
+
+  await driverExecuteQuery(conn, { query: sql })
 }
 
 export async function truncateElement (conn: Conn, elementName: string, typeOfElement: DatabaseElement, schema: string = 'public'): Promise<void> {

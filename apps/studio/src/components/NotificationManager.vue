@@ -12,14 +12,14 @@ export default Vue.extend({
   data: () => {
     return {
       upsellNotification: new Noty({
-        text: '您好！您应该升级到终极版 - 有更多功能可用哦！',
+        text: "👋 Beekeeper Studio 由一个小团队经营。购买完整版Beekeeper Studio以支持开发并获得更多功能。谢谢 ♥",
         timeout: false,
         queue: "upsell",
         layout: 'bottomRight',
         closeWith: ['button'],
         buttons: [
           Noty.button('关闭', 'btn btn-flat', () => Noty.closeAll('upsell')),
-          Noty.button('我看看', 'btn btn-primary', () => ipcRenderer.send(AppEvent.openExternally, ['https://beekeeperstudio.io/get#ultimate-features']))
+          Noty.button('快速上手', 'btn btn-primary', () => ipcRenderer.send(AppEvent.openExternally, ['https://beekeeperstudio.io/']))
         ]
       })
     }

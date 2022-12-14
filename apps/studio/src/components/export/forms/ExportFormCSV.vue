@@ -19,7 +19,7 @@
           name="headerRow"
           class="form-control"
         />
-        <span>包括标头</span>
+        <span>包含表头</span>
       </label>
     </div>
   </div>

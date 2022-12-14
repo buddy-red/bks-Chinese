@@ -16,7 +16,7 @@
           </div>
           <div class="expand"></div>
           <div class="actions">
-              <a @click.prevent="$emit('refresh')" v-tooltip="`${ctrlOrCmd('r')} 或 F5`" class="btn btn-link btn-fab"><i class="material-icons">refresh</i></a>
+              <a @click.prevent="$emit('refresh')" v-tooltip="`${ctrlOrCmd('r')} or F5`" class="btn btn-link btn-fab"><i class="material-icons">refresh</i></a>
               <a v-if="enabled && canAdd" @click.prevent="addRow" v-tooltip="ctrlOrCmd('n')" class="btn btn-primary btn-fab"><i class="material-icons">add</i></a>
           </div>
         </div>
@@ -113,10 +113,10 @@ export default Vue.extend({
         results.push("不支持添加关系")
       }
       if (!this.canDrop) {
-        results.push("不支持丢弃约束")
+        results.push("不支持删除受约束者")
       }
       if (results?.length) {
-        return `${DialectTitles[this.dialect]}: ${results.join(". ")}`
+        return `${DialectTitles[this.dialect]}: ${results.join(" ")}`
       }
       return null
     },
@@ -139,7 +139,7 @@ export default Vue.extend({
       const results: ColumnDefinition[] = [
         {
           field: 'constraintName',
-          title: "名称",
+          title: "Name",
           widthGrow: 2,
           editable,
           editor: vueEditor(NullableInputEditorVue),
@@ -147,18 +147,18 @@ export default Vue.extend({
         },
         {
           field: 'fromColumn',
-          title: "数据列",
+          title: "Column",
           editable,
-          editor: 'select',
+          editor: 'list',
           editorParams: {
             values: this.table.columns.map((c) => c.columnName)
           }
         },
         ...( showSchema ? [{
           field: 'toSchema',
-          title: "FK 模式",
+          title: "FK Schema",
           editable,
-          editor: 'select' as any,
+          editor: 'list' as any,
           editorParams: {
             values: [...this.schemas]
           },
@@ -166,42 +166,44 @@ export default Vue.extend({
         }] : []),
         {
           field: 'toTable',
-          title: "FK 数据表",
+          title: "FK Table",
           editable,
-          editor: 'select',
+          editor: 'list',
           editorParams: {
-            values: this.getTables
+            // @ts-ignore
+            valuesLookup: this.getTables
           },
           cellEdited: (cell) => cell.getRow().getCell('toColumn')?.setValue(null)
 
         },
         {
           field: 'toColumn',
-          title: "FK 数据列",
+          title: "FK Column",
           editable,
           editor: 'select',
           editorParams: {
-            values: this.getColumns
+            // @ts-ignore
+            valuesLookup: this.getColumns
           },
         },
         {
           field: 'onUpdate',
-          title: "于更新",
+          title: "On Update",
           editor: 'select',
           editable,
           editorParams: {
             values: this.dialectData.constraintActions,
-            defaultValue: '无操作'
+            defaultValue: 'NO ACTION'
           }
         },
         {
           field: 'onDelete',
-          title: '于删除',
+          title: 'On Delete',
           editable,
           editor: 'select',
           editorParams: {
             values: this.dialectData.constraintActions,
-            defaultValue: '无操作',
+            defaultValue: 'NO ACTION',
           }
         },
       ]
@@ -225,10 +227,10 @@ export default Vue.extend({
       return this.newRows.includes(cell.getRow())
     },
     getTables(cell: CellComponent): string[] {
-        const schema = cell.getRow().getData()['toSchema']
-        return schema ?
-          this.schemaTables.find((st) => st.schema === schema)?.tables.map((t) => t.name) :
-          this.tables.map((t) => t.name)
+      const schema = cell.getRow().getData()['toSchema']
+      return schema ?
+        this.schemaTables.find((st) => st.schema === schema)?.tables.map((t) => t.name) :
+        this.tables.map((t) => t.name)
     },
     getColumns(cell: CellComponent): string[] {
       const data = cell.getRow().getData()
@@ -266,8 +268,8 @@ export default Vue.extend({
       const t = this.tabulator as Tabulator
       const row = await t.addRow({
         constraintName: `${this.table.name}_relation_${this.tabulator.getData().length + 1}` ,
-        onUpdate: '无操作',
-        onDelete: '无操作'
+        onUpdate: 'NO ACTION',
+        onDelete: 'NO ACTION'
       })
       this.newRows.push(row);
       // TODO (fix): calling edit() on the column name cell isn't working here.
@@ -339,6 +341,9 @@ export default Vue.extend({
   mounted() {
     this.tabState.dirty = false
     this.initializeTabulator()
+  },
+  beforeDestroy() {
+    this.tabulator?.destroy()
   }
 })
 </script>

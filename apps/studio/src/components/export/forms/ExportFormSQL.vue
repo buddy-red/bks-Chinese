@@ -9,7 +9,7 @@
           name="schema"
           class="form-control"
         />
-        <span>包括数据表模式(如果适用)</span>
+        <span>包含数据表架构(如果适用)</span>
       </label>
     </div>
     <div class="form-group row">

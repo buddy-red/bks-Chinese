@@ -8,7 +8,7 @@
       <div class="center-wrap">
         <div class="table-builder-header">
           <div class="form-group" v-if="defaultSchema">
-            <label for="schema">模式</label>
+            <label for="schema">数据库架构</label>
             <input type="text" v-model="tableSchema" :placeholder="defaultSchema">
           </div>
           <div class="form-group">
@@ -110,10 +110,8 @@ export default Vue.extend({
       return results
     },
     defaultSchema() {
-      if (this.dialect === 'postgresql') return 'public'
-      if (this.dialect === 'redshift') return 'public'
-      if (this.dialect === 'sqlserver') return 'dbo'
-      return undefined
+      return this.connection.defaultSchema ?
+        this.connection.defaultSchema() : undefined
     },
     fixedSchema(): string | undefined {
       if (_.isNil(this.tableSchema) || _.isEmpty(this.tableSchema)) {

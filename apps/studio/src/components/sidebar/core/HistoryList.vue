@@ -6,7 +6,7 @@
         <div class="list-heading row">
           <div class="sub row flex-middle expand">
             <div class="expand" title="Query execution history for this workspace">
-              记录
+              History
             </div>
             <div class="actions">
               <a @click.prevent="refresh">
@@ -18,7 +18,7 @@
         <error-alert v-if="error" :error="error" title="Problem loading history" />
         <sidebar-loading v-else-if="loading" />
         <div v-else-if="!history.length" class="empty">
-          没有最近查询
+          No recent queries
         </div>
         <div v-else class="list-body">
           <div class="list-item" @contextmenu.prevent.stop="openContextMenu($event, item)" v-for="item in history" :key="item.id">
@@ -44,7 +44,7 @@
 <script>
 import _ from 'lodash'
 import TimeAgo from 'javascript-time-ago';
-import { mapState } from 'vuex'
+  import { mapState } from 'vuex'
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import SidebarLoading from '@/components/common/SidebarLoading.vue'
 
@@ -60,7 +60,7 @@ import SidebarLoading from '@/components/common/SidebarLoading.vue'
     computed: {
       ...mapState('data/usedQueries', { 'history': 'items', 'loading': 'loading', 'error': 'error'},),
       removeTitle() {
-        return `移除 ${this.checkedHistoryQueries.length} 保存记录查询`;
+        return `Remove ${this.checkedHistoryQueries.length} saved history queries`;
       }
     },
     mounted() {
@@ -87,7 +87,7 @@ import SidebarLoading from '@/components/common/SidebarLoading.vue'
           event, item,
           options: [
             {
-              name: "移除",
+              name: "Remove",
               handler: ({ item }) => this.remove(item)
             }
           ]

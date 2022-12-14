@@ -23,7 +23,7 @@
       <div v-if="loading" class="table-properties-loading">
         <x-progressbar></x-progressbar>
       </div>
-      <div class="table-properties-wrap" v-if="table">
+      <div class="table-properties-wrap" v-if="table && !loading">
         <component
           class="schema-builder"
           :is="pill.component"
@@ -41,25 +41,20 @@
         >
           <template v-slot:footer>
             <div class="statusbar-info col flex expand">
-              <x-button @click.prevent="openData" class="btn btn-flat btn-icon end" title="View Data">
-                Data <i class="material-icons">north_east</i>
+              <x-button @click.prevent="openData" class="btn btn-flat btn-icon end" title="浏览数据">
+                数据 <i class="material-icons">north_east</i>
               </x-button>
               <template v-if="properties">
-                <a class="statusbar-item hoverable" @click.prevent="fetchTotalRecords" :title="totalRecords === null ? 'Click to fetch total record count' : `Approximately ${totalRecords} Records`">
-                  <i class="material-icons">list_alt</i>
-                  <span v-if="fetchingTotalRecords">loading...</span>
-                  <span v-else-if="totalRecords === null">Unknown</span>
-                  <span v-else>~{{totalRecords.toLocaleString()}}</span>
-                </a>
-                <span class="statusbar-item" v-if="humanSize !== null" :title="`Table Size ${humanSize}`">
+                <table-length :table="table" :connection="connection" />
+                <span class="statusbar-item" v-if="humanSize !== null" :title="`数据表大小 ${humanSize}`">
                   <i class="material-icons">aspect_ratio</i>
                   <span>{{humanSize}}</span>
                 </span>
-                <span class="statusbar-item" v-if="humanIndexSize !== null" :title="`Index Size ${humanIndexSize}`">
+                <span class="statusbar-item" v-if="humanIndexSize !== null" :title="`索引大小  ${humanIndexSize}`">
                   <i class="material-icons">location_searching</i>
                   <span>{{humanIndexSize}}</span>
                 </span>
-                <span class="statusbar-item" v-if="!editable" title="Only tables can be edited.">
+                <span class="statusbar-item" v-if="!editable" title="仅能编辑的数据表">
                   <i class="material-icons-outlined">report_problem</i> 只读
                 </span>
               </template>
@@ -100,6 +95,7 @@ import TableSchemaVue from './tableinfo/TableSchema.vue'
 import TableIndexesVue from './tableinfo/TableIndexes.vue'
 import TableRelationsVue from './tableinfo/TableRelations.vue'
 import TableTriggersVue from './tableinfo/TableTriggers.vue'
+import TableLength from '@/components/common/TableLength.vue'
 import { format as humanBytes } from 'bytes'
 import platformInfo from '../common/platform_info'
 import { AppEvent } from '@/common/AppEvent'
@@ -109,7 +105,7 @@ import rawLog from 'electron-log'
 const log = rawLog.scope('TabTableProperties')
 export default {
   props: ["connection", "tabId", "active", "tab", "table"],
-  components: { Statusbar },
+  components: { Statusbar, TableLength },
   data() {
     return {
       initialized: false,
@@ -118,20 +114,18 @@ export default {
       error: null,
       primaryKeys: [],
       properties: {},
-      totalRecords: null,
-      fetchingTotalRecords: false,
       dirtyPills: {},
       rawPills: [
         {
           id: 'schema',
-          name: "数据列",
+          name: "Columns",
           needsProperties: false,
           component: TableSchemaVue,
           dirty: false,
         },
         {
           id: 'indexes',
-          name: "索引",
+          name: "Indexes",
           tableOnly: true,
           needsProperties: true,
           component: TableIndexesVue,
@@ -139,7 +133,7 @@ export default {
         },
         {
           id: 'relations',
-          name: "关系",
+          name: "Relations",
           tableOnly: true,
           needsProperties: true,
           component: TableRelationsVue,
@@ -147,7 +141,7 @@ export default {
         },
         {
           id: 'triggers',
-          name: "触发器",
+          name: "Triggers",
           tableOnly: true,
           needsProperties: true,
           component: TableTriggersVue,
@@ -225,7 +219,7 @@ export default {
       try {
         this.totalRecords = await this.connection.getTableLength(this.table.name, this.table.schema)
       } catch (ex) {
-        console.error("不能提取记录总计", ex)
+        console.error("不能获取总记录", ex)
         this.totalRecords = 0
       } finally {
         this.fetchingTotalRecords = false
@@ -243,6 +237,7 @@ export default {
       this.error = null
       // this.properties = null
       try {
+        await this.$store.dispatch('updateTableColumns', this.table)
         this.primaryKeys = await this.connection.getPrimaryKeys(this.table.name, this.table.schema)
         if (this.table.entityType === 'table') {
           this.properties = await this.connection.getTableProperties(this.table.name, this.table.schema)

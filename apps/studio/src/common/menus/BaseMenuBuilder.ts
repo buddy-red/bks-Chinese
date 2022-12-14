@@ -12,7 +12,7 @@ export default class BaseMenuBuilder {
   constructor(private settings: IGroupedUserSettings, private actionHandlers: IMenuActionHandler) {}
 
   buildTemplate() {
-    throw new Error("必须为您的平台实现buildTemplate")
+    throw new Error("Must implement buildTemplate for your platform")
   }
 
   get menuItems() {

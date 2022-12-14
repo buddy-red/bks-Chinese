@@ -7,7 +7,7 @@
       <div class="alert alert-danger expand">
         <i class="material-icons">error_outline</i>
         <div class="alert-body expand">
-          所选数据库中不存在此表
+          该数据表在所选数据库中不存在
         </div>
         <a @click.prevent="$emit('close', tab)" class="btn btn-flat">关闭标签页</a>
       </div>
@@ -26,6 +26,7 @@ export default Vue.extend({
   computed: {
     ...mapState(['tables', 'tablesInitialLoaded']),
     table() {
+      console.log("table changed")
       return this.tab.findTable(this.tables)
     },
   }

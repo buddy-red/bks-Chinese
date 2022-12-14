@@ -9,7 +9,7 @@
           name="prettyprint"
           class="form-control"
         />
-        <span>Pretty-print</span>
+        <span>漂亮打印</span>
       </label>
     </div>
   </div>

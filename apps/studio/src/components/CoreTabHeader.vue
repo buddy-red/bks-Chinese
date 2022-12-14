@@ -18,17 +18,19 @@
         </div>
       </a>
     </li>
-    <modal :name="modalName" class="beekeeper-modal vue-dialog sure header-sure" @opened="sureOpened" @closed="sureClosed" @before-open="beforeOpened">
-      <div class="dialog-content">
-        <div class="dialog-c-title">确定要关闭 <span class="tab-like"><tab-icon :tab="tab" /> {{this.tab.title}}</span>?</div>
-        <p>您将丢失未保存的更改</p>
-      </div>
-      <div class="vue-dialog-buttons">
-        <span class="expand"></span>
-        <button ref="no" @click.prevent="$modal.hide(modalName)" class="btn btn-sm btn-flat">取消</button>
-        <button @focusout="sureOpen && $refs.no && $refs.no.focus()" @click.prevent="closeForReal" class="btn btn-sm btn-primary">关闭标签页</button>
-      </div>
-    </modal>
+    <portal to="modals">
+      <modal :name="modalName" class="beekeeper-modal vue-dialog sure header-sure" @opened="sureOpened" @closed="sureClosed" @before-open="beforeOpened">
+        <div class="dialog-content">
+          <div class="dialog-c-title">真要关闭 <span class="tab-like"><tab-icon :tab="tab" /> {{this.tab.title}}</span>?</div>
+          <p>您将会失去未保存的更改</p>
+        </div>
+        <div class="vue-dialog-buttons">
+          <span class="expand"></span>
+          <button ref="no" @click.prevent="$modal.hide(modalName)" class="btn btn-sm btn-flat">取消</button>
+          <button @focusout="sureOpen && $refs.no && $refs.no.focus()" @click.prevent="closeForReal" class="btn btn-sm btn-primary">关闭标签页</button>
+        </div>
+      </modal>
+    </portal>
   </div>
 </template>
 <script>

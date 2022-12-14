@@ -32,7 +32,7 @@ export default Vue.extend({
         .filter((folder) => folder.id !== this.item.queryFolderId)
         .map((folder: IQueryFolder) => {
         return {
-          name: `移动至 ${folder.name}`,
+          name: `Move to ${folder.name}`,
           handler: this.moveItem,
           folder
         }
@@ -62,7 +62,7 @@ export default Vue.extend({
         await this.$store.dispatch('data/queries/save', updated)
 
       } catch (ex) {
-        this.$noty.error(`移动出错: ${ex.message}`)
+        this.$noty.error(`Move Error: ${ex.message}`)
         console.error(ex)
       }
     },
@@ -71,20 +71,20 @@ export default Vue.extend({
         item, event,
         options: [
           {
-            name: "打开",
+            name: "Open",
             handler: ({ item }) => this.$emit('open', item)
           },
           {
-            name: "重命名",
+            name: "Rename",
             handler: ({ item }) => this.$emit('rename', item)
             
           },
           {
-            name: "删除",
+            name: "Delete",
             handler: ({ item }) => this.$emit('remove', item)
           },
           {
-            type: '分隔'
+            type: 'divider'
           },
           ...this.moveToOptions
         ]

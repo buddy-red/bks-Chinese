@@ -4,7 +4,7 @@
       <div class="form-group col" v-if="supportsSocketPath">
         <label for="connectionMode">连接模式</label>
         <select name="" v-model="config.socketPathEnabled" id="">
-          <option :value="false">主机 & 端口</option>
+          <option :value="false">主机和端口</option>
           <option :value="true">Socket</option>
         </select>
       </div>
@@ -40,27 +40,27 @@
         <div class="row gutter">
           <div class="alert alert-info">
             <i class="material-icons-outlined">info</i>
-            <div>提供证书文件为选填，默认情况下，Beekeeper只会信任服务器证书。
-              <external-link href="https:/docs.beekeeperstudio.io/guide/#ssl">更多信息</external-link></div>
+            <div>提供证书文件为选填。默认情况下，系统将只信任服务器证书。
+              </div>
           </div>
         </div>
         <div class="row gutter">
           <div class="col form-group">
-            <label>CA Cert (选填)</label>
+            <label>CA Cert(选填)</label>
             <file-picker v-model="config.sslCaFile" :disabled="!config.ssl"></file-picker>
           </div>
         </div>
 
         <div class="row gutter">
           <div class="col form-group">
-            <label>证书 (选填)</label>
+            <label>证书(选填)</label>
             <file-picker v-model="config.sslCertFile" :disabled="!config.ssl"></file-picker>
           </div>
         </div>
 
         <div class="row gutter">
           <div class="col form-group">
-            <label>密钥文件 (选填)</label>
+            <label>密钥文件(选填)</label>
             <file-picker v-model="config.sslKeyFile" :disabled="!config.ssl"></file-picker>
           </div>
         </div>
@@ -69,7 +69,7 @@
             <label class="checkbox-group" for="reject">
               <input class="form-control" id="reject" type="checkbox" name="rememberPassword" v-model="config.sslRejectUnauthorized">
               <span>拒绝未经授权</span>
-              <i class="material-icons" v-tooltip="'仅当您提供证书文件时才生效'">help_outlined</i>
+              <i class="material-icons" v-tooltip="'This only takes effect if you provide certificate files'">help_outlined</i>
             </label>
 
           </div>
@@ -98,14 +98,12 @@
 
 <script>
 import FilePicker from '@/components/common/form/FilePicker'
-import ExternalLink from '@/components/common/ExternalLink'
 import { findClient } from '@/lib/db/clients'
 
   export default {
     props: ['config'],
     components: {
-      FilePicker,
-      ExternalLink
+      FilePicker
     },
     data() {
       return {

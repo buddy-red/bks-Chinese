@@ -12,7 +12,7 @@
               <h3 class="card-title" v-if="pageTitle">{{pageTitle}}</h3>
               <ImportButton :config="config">自网址导入</ImportButton>
             </div>
-            <error-alert :error="errors" title="Please fix the following errors" />
+            <error-alert :error="errors" title="请修复以下出错" />
             <form @action="submit" v-if="config">
               <div class="form-group">
                 <label for="connectionType">连接类型</label>
@@ -54,7 +54,7 @@
           </div>
         </div>
 
-        <small class="app-version"><a href="https://www.beekeeperstudio.io/releases/latest">Beekeeper Studio 版本 {{version}}</a></small>
+        <small class="app-version">版本：{{version}}</small>
       </div>
     </div>
   </div>
@@ -77,10 +77,10 @@
   import platformInfo from '@/common/platform_info'
   import ErrorAlert from './common/ErrorAlert.vue'
   import rawLog from 'electron-log'
-  import { mapGetters, mapState } from 'vuex'
-  import { dialectFor } from '@shared/lib/dialects/models'
-  import { findClient } from '@/lib/db/clients'
-  import OtherDatabaseNotice from './connection/OtherDatabaseNotice.vue'
+import { mapGetters, mapState } from 'vuex'
+import { dialectFor } from '@shared/lib/dialects/models'
+import { findClient } from '@/lib/db/clients'
+import OtherDatabaseNotice from './connection/OtherDatabaseNotice.vue'
 
   const log = rawLog.scope('ConnectionInterface')
   // import ImportUrlForm from './connection/ImportUrlForm';
@@ -141,7 +141,7 @@
           this.connectionError.message &&
           this.connectionError.message.includes('self signed certificate')
         ) {
-          this.errorHelp = `您可能需要查看 '信任服务器证书'`
+          this.errorHelp = `您可能需要选取'信任服务器证书'`
         } else {
         this.errorHelp = null
         }
@@ -184,7 +184,7 @@
         const file = files[0]
         const allGood = this.config.parse(file.path)
         if (!allGood) {
-          this.$noty.error(`不能打开 '${file.name}'，它不是一个有效的SQLite文件。`);
+          this.$noty.error(`无法打开 '${file.name}'，它不是有效的SQLite文件。`);
           return
         } else {
           this.submit()
@@ -216,7 +216,7 @@
           this.$noty.success(`已成功复制连接!`)
           this.config = this.connections.find((c) => c.id === id) || this.config
         } catch (ex) {
-          this.$noty.error(`不能复制连接: ${ex.message}`)
+          this.$noty.error(`无法复制连接: ${ex.message}`)
         }
 
       },
@@ -260,17 +260,17 @@
             throw new Error("名称必填")
           }
           await this.$store.dispatch('data/connections/save', this.config)
-          this.$noty.success("数据库连接已保存")
+          this.$noty.success("连接已保存")
         } catch (ex) {
           console.error(ex)
           this.errors = [ex.message]
-          this.$noty.error("不能保存数据库连接信息")
+          this.$noty.error("不能保持连接信息")
         }
       },
       handleErrorMessage(message){
         if (message){
           this.errors = [message]
-          this.$noty.error("不能解析数据库连接网址")
+          this.$noty.error("无法解析连接网址")
         }else{
           this.errors = null
         }

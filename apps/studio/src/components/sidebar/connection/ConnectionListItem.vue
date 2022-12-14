@@ -52,7 +52,7 @@ export default {
         .filter((folder) => folder.id !== this.config.connectionFolderId)
         .map((folder) => {
         return {
-          name: `移动至 ${folder.name}`,
+          name: `移至 ${folder.name}`,
           slug: `move-${folder.id}`,
           handler: this.moveItem,
           folder
@@ -124,7 +124,7 @@ export default {
           handler: (blob) => this.doubleClick(blob.item)
         },
         {
-          name: "复制",
+          name: "创建副本",
           slug: 'duplicate',
           handler: this.duplicate
         },
@@ -133,7 +133,7 @@ export default {
           handler: this.copyUrl
         },
         {
-          name: "移除",
+          name: "移出",
           handler: this.remove
         },
       ]
@@ -162,7 +162,7 @@ export default {
         updated.connectionFolderId = folder.id
         await this.$store.dispatch('data/connections/save', updated)
       } catch(ex) {
-        this.$noty.error(`移动出错: ${ex.message}`)
+        this.$noty.error(`移动错误: ${ex.message}`)
         console.error(ex)
       }
     },
@@ -191,9 +191,9 @@ export default {
     async copyUrl() {
       try {
         await this.$copyText(this.$bks.buildConnectionString(this.config))
-        this.$noty.success(`${this.connectionType} 已复制!`)
+        this.$noty.success(`The ${this.connectionType} 已复制!`)
       } catch (err) {
-        this.$noty.success(`${this.connectionType} 不能复制!`)
+        this.$noty.success(`The ${this.connectionType} 不能复制!`)
       }
     }
   }

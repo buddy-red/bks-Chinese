@@ -3,9 +3,9 @@
     <template v-if="results.length > 0">
       <div class="truncate statusbar-info">
         <span v-show="results.length > 1" class="statusbar-item result-selector" :title="'Results'">
-        <div class="select-wrap" v-tooltip="{content: '更多查询结果于此', placement: 'top', show: showHint, trigger: 'manual', classes: ['tooltip-info']}">
+        <div class="select-wrap" v-tooltip="{content: '更多查询结果在这里', placement: 'top', show: showHint, trigger: 'manual', classes: ['tooltip-info']}">
           <select name="resultSelector" id="resultSelector" @change="updateValue" class="form-control">
-            <option v-for="(result, index) in results" :selected="value == index" :key="index" :value="index">Result {{index + 1}}: {{shortNum(result.rows.length, 0)}} {{pluralize('row', result.rows.length, false)}}</option>
+            <option v-for="(result, index) in results" :selected="value == index" :key="index" :value="index">结果 {{index + 1}}: {{shortNum(result.rows.length, 0)}} {{pluralize('row', result.rows.length, false)}}</option>
           </select>
         </div>
         </span>
@@ -30,7 +30,7 @@
       <span class="empty">无数据</span>
     </template>
     <div class="flex-right">
-      <x-button class="btn btn-flat btn-icon end" menu>
+      <x-button class="btn btn-flat btn-icon end" :disabled="results.length === 0" menu>
         下载 <i class="material-icons">arrow_drop_down</i>
         <x-menu>
           <x-menuitem @click.prevent="download('csv')">
@@ -46,13 +46,13 @@
             <x-label>Markdown</x-label>
           </x-menuitem>
           <hr>
-          <x-menuitem title="Probably don't do this with large results (500+)" @click.prevent="copyToClipboard">
+          <x-menuitem title="不推荐在量大的结果上这样做(500+)" @click.prevent="copyToClipboard">
             <x-label>复制到剪贴板(TSV / Excel)</x-label>
           </x-menuitem>
-          <x-menuitem title="Probably don't do this with large results (500+)" @click.prevent="copyToClipboardJson">
+          <x-menuitem title="不推荐在量大的结果上这样做(500+)" @click.prevent="copyToClipboardJson">
             <x-label>复制到剪贴板(JSON)</x-label>
           </x-menuitem>
-          <x-menuitem title="Probably don't do this with large results (500+)" @click.prevent="copyToClipboardMarkdown">
+          <x-menuitem title="不推荐在量大的结果上这样做(500+)" @click.prevent="copyToClipboardMarkdown">
             <x-label>复制到剪贴板(Markdown)</x-label>
           </x-menuitem>
         </x-menu>

@@ -9,7 +9,7 @@
       <label class="checkbox-group" for="rememberPassword">
         <input class="form-control" id="rememberPassword" type="checkbox" name="rememberPassword" v-model="config.rememberPassword">
         <span>保存密码</span>
-        <i class="material-icons" v-tooltip="'密码已被加密保存'">help_outlined</i>
+        <i class="material-icons" v-tooltip="'Passwords are encrypted when saved'">help_outlined</i>
       </label>
       <span class="expand"></span>
       <ColorPicker :value="config.labelColor" v-model="config.labelColor"></ColorPicker>

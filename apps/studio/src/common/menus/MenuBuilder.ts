@@ -10,7 +10,7 @@ export default class extends DefaultMenu {
 
   viewMenu(): Electron.MenuItemConstructorOptions {
     const result: Electron.MenuItemConstructorOptions = {
-      label: '浏览',
+      label: 'View',
       submenu: [
         this.menuItems.zoomreset,
         this.menuItems.zoomin,
@@ -44,7 +44,7 @@ export default class extends DefaultMenu {
     }
 
     const fileMenu = {
-      label: '文件',
+      label: 'File',
       submenu: [
         this.menuItems.newWindow,
         this.menuItems.newTab,
@@ -59,7 +59,7 @@ export default class extends DefaultMenu {
       ...appMenu,
       fileMenu,
       {
-        label: '编辑',
+        label: 'Edit',
         submenu: [
           this.menuItems.undo,
           this.menuItems.redo,
@@ -71,7 +71,7 @@ export default class extends DefaultMenu {
       },
       this.viewMenu(),
       {
-        label: "帮助",
+        label: "Help",
         submenu: [
           this.menuItems.opendocs,
           this.menuItems.addBeekeeper,

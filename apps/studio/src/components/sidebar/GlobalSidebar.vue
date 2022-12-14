@@ -5,7 +5,7 @@
         @click.prevent="click('tables')"
         class="nav-item selectable"
         :class="{ active: activeItem === 'tables'}"
-        title="数据库"
+        title="Database"
       >
         <span class="bk-database"></span>
       </a>
@@ -14,7 +14,7 @@
         @click.prevent="click('queries')"
         class="nav-item selectable"
         :class="{ active: activeItem === 'queries'}"
-        title="已保存查询"
+        title="Saved Queries"
       >
         <span class="material-icons">code</span>
       </a>
@@ -23,7 +23,7 @@
         @click.prevent="click('history')"
         class="nav-item selectable"
         :class="{ active: activeItem === 'history'}"
-        title="运行记录"
+        title="Run History"
       >
         <span class="material-icons">history</span>
       </a>

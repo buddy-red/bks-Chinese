@@ -4,7 +4,7 @@
       <div class="center-wrap">
         <div class="table-subheader">
           <div class="table-title">
-            <h2>Triggers</h2>
+            <h2>触发器</h2>
           </div>
           <div class="table-actions">
             <!-- <a class="btn btn-flat btn-icon btn-small"><i class="material-icons">add</i> Trigger</a> -->
@@ -79,11 +79,14 @@ export default {
         headerSort: true,
         maxInitialWidth: globals.maxColumnWidthTableInfo,
       },
-      placeholder: "No triggers",
+      placeholder: "无触发器",
       layout: 'fitColumns'
 
 
     })
+  },
+  beforeDestroy() {
+    if (this.tabulator) this.tabulator.destroy()
   }
 }
 </script>

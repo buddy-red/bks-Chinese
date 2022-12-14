@@ -32,6 +32,6 @@ export const SqliteData: DialectData = {
     },
   },
   notices: {
-    infoSchema: "Note: SQLite does not support any column alterations except renaming"
+    infoSchema: "注：SQLite不支持除重命名之外的任何列更改"
   }
 }

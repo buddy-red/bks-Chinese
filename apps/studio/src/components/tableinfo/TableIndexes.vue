@@ -129,7 +129,7 @@ export default Vue.extend({
       return result
     },
     notice() {
-      return this.dialect === 'mysql' ? 'MySQL 8.0 之前的版本只支持升序索引' : null
+      return this.dialect === 'mysql' ? 'MySQL 8.0之前的版本只支持升序索引' : null
     },
     indexColumnOptions() {
       const normal = this.table.columns.map((c) => c.columnName)
@@ -291,7 +291,7 @@ export default Vue.extend({
         data: this.tableData,
         columns: this.tableColumns,
         layout: 'fitColumns',
-        placeholder: "无索引",
+        placeholder: "No Indexes",
         height: 'auto',
         columnDefaults: {
           title: '',
@@ -299,6 +299,9 @@ export default Vue.extend({
           headerSort: false,
         },
       })
+  },
+  beforeDestroy() {
+    if (this.tabulator) this.tabulator.destroy()
   }
 })
 </script>

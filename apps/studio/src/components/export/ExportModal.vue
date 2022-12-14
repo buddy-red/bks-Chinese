@@ -22,7 +22,7 @@
           </span>
           <div v-if="error" class="alert alert-danger">
             <i class="material-icons">error_outline</i>
-            <div>Error: {{ error.message }}</div>
+            <div>出错: {{ error.message }}</div>
           </div>
           <div class="modal-form export-form">
             
@@ -36,14 +36,14 @@
               
               <!-- Format -->
               <div class="format form-group">
-                <label for="connectionType">Format</label>
+                <label for="connectionType">各式</label>
                 <select
                   name="connectionType"
                   class="form-control custom-select"
                   v-model="selectedExportFormat"
                   id="export-format-select"
                 >
-                  <option disabled value="null">Select a format...</option>
+                  <option disabled value="null">选择一个格式...</option>
                   <option
                     :key="f.value"
                     v-for="f in exportFormats"
@@ -82,7 +82,7 @@
               ></component>
               <div class="modal-form export-form export-advanced-options">
                 <div class="form-group row">
-                  <label title="How many records to read at once from the cursor">Chunk size</label>
+                  <label title="一次从游标读取多少条记录">区块大小</label>
                     <input
                       v-model="options.chunkSize"
                       type="number"
@@ -210,7 +210,7 @@ export default {
       return path.join(this.fileDirectory, this.fileName)
     },
     dialogOptions() {
-      const result = { buttonLabel: '选择目录', properties: [ 'openDirectory', 'createDirectory'] }
+      const result = { buttonLabel: 'Choose Directory', properties: [ 'openDirectory', 'createDirectory'] }
       return result
     },
     hasFilters() {

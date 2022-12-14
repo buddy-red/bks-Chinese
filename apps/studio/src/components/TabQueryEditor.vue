@@ -10,7 +10,7 @@
         <div class="alert alert-danger">
           <i class="material-icons">error_outline</i>
           <div class="alert-body">
-            此查询已被其他人删除，不再可编辑。
+            此查询已被其他人删除，不可再编辑。
           </div>
           <a @click.prevent="close" class="btn btn-flat">关闭标签页</a>
         </div>
@@ -22,7 +22,7 @@
           <x-button @click.prevent="triggerSave" class="btn btn-flat btn-small">保存</x-button>
 
           <x-buttons class="">
-            <x-button class="btn btn-primary btn-small" v-tooltip="'Ctrl+回车键'" @click.prevent="submitTabQuery">
+            <x-button class="btn btn-primary btn-small" v-tooltip="'Ctrl+回车'" @click.prevent="submitTabQuery">
               <x-label>{{hasSelectedText ? '运行所选' : '运行'}}</x-label>
             </x-button>
             <x-button class="btn btn-primary btn-small" menu>
@@ -30,11 +30,11 @@
               <x-menu>
                 <x-menuitem @click.prevent="submitTabQuery">
                   <x-label>{{hasSelectedText ? '运行所选' : '运行'}}</x-label>
-                  <x-shortcut value="Control+回车键"></x-shortcut>
+                  <x-shortcut value="Control+回车"></x-shortcut>
                 </x-menuitem>
                 <x-menuitem @click.prevent="submitCurrentQuery">
                   <x-label>运行当前</x-label>
-                  <x-shortcut value="Control+Shift+回车键"></x-shortcut>
+                  <x-shortcut value="Control+Shift+回车"></x-shortcut>
                 </x-menuitem>
               </x-menu>
             </x-button>
@@ -50,7 +50,7 @@
       <div class="message" v-else-if="result">
         <div class="alert alert-info">
           <i class="material-icons-outlined">info</i>
-          <span>Query {{selectedResult + 1}}/{{results.length}}: 无结果 {{result.affectedRows || 0}} 行受影响，请查看左下角的选择框 ↙ 了解更多查询结果。</span>
+          <span>查询 {{selectedResult + 1}}/{{results.length}}: 无结果 {{result.affectedRows || 0}} 行受影响。 更多查询结果见 ↙ 左下方的选择框</span>
         </div>
       </div>
       <div class="message" v-else-if="errors">
@@ -80,48 +80,51 @@
     </div>
 
     <!-- Save Modal -->
-    <modal class="vue-dialog beekeeper-modal" name="save-modal" @closed="selectEditor" @opened="selectTitleInput" height="auto" :scrollable="true">
-      <form v-if="query" @submit.prevent="saveQuery">
-        <div class="dialog-content">
-          <div class="dialog-c-title">保存查询名称</div>
-          <div class="modal-form">
-            <div class="alert alert-danger save-errors" v-if="saveError">{{saveError}}</div>
-            <div class="form-group">
-                <input type="text" ref="titleInput" name="title" class="form-control"  v-model="query.title" autofocus>
+    <portal to="modals">
+      <modal class="vue-dialog beekeeper-modal" name="save-modal" @closed="selectEditor" @opened="selectTitleInput" height="auto" :scrollable="true">
+        <form v-if="query" @submit.prevent="saveQuery">
+          <div class="dialog-content">
+            <div class="dialog-c-title">已保存查询名称</div>
+            <div class="modal-form">
+              <div class="alert alert-danger save-errors" v-if="saveError">{{saveError}}</div>
+              <div class="form-group">
+                  <input type="text" ref="titleInput" name="title" class="form-control"  v-model="query.title" autofocus>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="vue-dialog-buttons">
-          <button class="btn btn-flat" type="button" @click.prevent="$modal.hide('save-modal')">取消</button>
-          <button class="btn btn-primary" type="submit">保存</button>
-        </div>
-      </form>
-    </modal>
+          <div class="vue-dialog-buttons">
+            <button class="btn btn-flat" type="button" @click.prevent="$modal.hide('save-modal')">取消</button>
+            <button class="btn btn-primary" type="submit">保存</button>
+          </div>
+        </form>
+      </modal>
+    </portal>
 
     <!-- Parameter modal -->
-    <modal class="vue-dialog beekeeper-modal" name="parameters-modal" @opened="selectFirstParameter" @closed="selectEditor" height="auto" :scrollable="true">
-      <form @submit.prevent="submitQuery(queryForExecution, true)">
-        <div class="dialog-content">
-          <div class="dialog-c-title">请提供参数值</div>
-          <div class="dialog-c-subtitle">您需要在字符串值周围使用单引号，空白值无效。</div>
-          <div class="modal-form">
-            <div class="form-group">
-                <div v-for="(param, index) in queryParameterPlaceholders" v-bind:key="index">
-                  <div class="form-group row">
-                    <label>{{param}}</label>
-                    <input type="text" class="form-control" required v-model="queryParameterValues[param]" autofocus ref="paramInput">
+    <portal to="modals">
+      <modal class="vue-dialog beekeeper-modal" name="parameters-modal" @opened="selectFirstParameter" @closed="selectEditor" height="auto" :scrollable="true">
+        <form @submit.prevent="submitQuery(queryForExecution, true)">
+          <div class="dialog-content">
+            <div class="dialog-c-title">请提供参数值</div>
+            <div class="dialog-c-subtitle">您需要在字符串值周围使用单引号。空白值无效</div>
+            <div class="modal-form">
+              <div class="form-group">
+                  <div v-for="(param, index) in queryParameterPlaceholders" v-bind:key="index">
+                    <div class="form-group row">
+                      <label>{{param}}</label>
+                      <input type="text" class="form-control" required v-model="queryParameterValues[param]" autofocus ref="paramInput">
+                    </div>
                   </div>
-                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="vue-dialog-buttons">
-          <button class="btn btn-flat" type="button" @click.prevent="$modal.hide('parameters-modal')">取消</button>
-          <button class="btn btn-primary" type="submit">运行</button>
-        </div>
-      </form>
-    </modal>
-
+          <div class="vue-dialog-buttons">
+            <button class="btn btn-flat" type="button" @click.prevent="$modal.hide('parameters-modal')">取消</button>
+            <button class="btn btn-primary" type="submit">运行</button>
+          </div>
+        </form>
+      </modal>
+    </portal>
   </div>
 </template>
 
@@ -187,7 +190,7 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
       }
     },
     computed: {
-      ...mapGetters(['dialect']),
+      ...mapGetters(['dialect', 'defaultSchema']),
       ...mapState(['usedConfig', 'connection', 'database', 'tables', 'storeInitialized']),
       ...mapState('data/queries', {'savedQueries': 'items'}),
       shouldInitialize() {
@@ -245,7 +248,7 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
         return result.length ? result : null
       },
       runningText() {
-        return `运行${this.runningType} (${pluralize('query', this.runningCount, true)})`
+        return `Running ${this.runningType} (${pluralize('query', this.runningCount, true)})`
       },
       hasSelectedText() {
         return this.editor ? !!this.editor.getSelection() : false
@@ -309,29 +312,36 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
         return this.connection.connectionType;
       },
       hintOptions() {
+        // Previously we had to provide a table: column[] mapping.
+        // we don't need to provide the columns anymore because we fetch them dynamically.
         const result = {}
         this.tables.forEach(table => {
-          const cleanColumns = table.columns.map(col => {
-            return /\./.test(col.columnName) ? `"${col.columnName}"` : col.columnName
-          })
+          if (table.schema && table.schema != this.defaultSchema) {
+            // do nothing - don't add this table
+          } else {
+            // add quoted option for everyone that needs to be quoted
+            if (this.connectionType === 'postgresql' && (/[^a-z0-9_]/.test(table.name) || /^\d/.test(table.name))) {
+              result[`"${table.name}"`] = []
+            }
 
-          // add quoted option for everyone that needs to be quoted
-          if (this.connectionType === 'postgresql' && (/[^a-z0-9_]/.test(table.name) || /^\d/.test(table.name)))
-            result[`"${table.name}"`] = cleanColumns
-
-          // don't add table names that can get in conflict with database schema
-          if (!/\./.test(table.name))
-            result[table.name] = cleanColumns
+            // don't add table names that can get in conflict with database schema
+            if (!/\./.test(table.name)) {
+              result[table.name] = []
+            }
+          }
         })
         return { tables: result }
       },
       queryParameterPlaceholders() {
-        const params = this.individualQueries.flatMap((qs) => qs.parameters)
-        if (params.length && params[0] === '?') {
-          return []
-        } else {
-          return _.uniq(params)
+        let params = this.individualQueries.flatMap((qs) => qs.parameters)
+
+        if (this.currentlySelectedQuery && (this.hasSelectedText || this.runningType === 'current')) {
+          params = this.currentlySelectedQuery.parameters
         }
+
+        if (params.length && params[0] === '?') return []
+
+        return _.uniq(params)
       },
       deparameterizedQuery() {
         let query = this.queryForExecution
@@ -412,9 +422,9 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
         const [markStart, markEnd] = this.locationFromPosition(editorText, from, to)
         this.marker = this.editor.getDoc().markText(markStart, markEnd, {className: 'highlight'})
       },
-      hintOptions() {
+      tables() {
         this.editor?.setOption('hintOptions',this.hintOptions)
-      },
+      }
     },
     methods: {
       locationFromPosition(queryText, ...rawPositions) {
@@ -469,10 +479,10 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
           })
 
           const runQueryKeyMap = {
-            "Shift-Ctrl-回车键": this.submitCurrentQuery,
-            "Shift-Cmd-回车键": this.submitCurrentQuery,
-            "Ctrl-回车键": this.submitTabQuery,
-            "Cmd-回车键": this.submitTabQuery,
+            "Shift-Ctrl-回车": this.submitCurrentQuery,
+            "Shift-Cmd-回车": this.submitCurrentQuery,
+            "Ctrl-回车": this.submitTabQuery,
+            "Cmd-回车": this.submitTabQuery,
             "Ctrl-S": this.triggerSave,
             "Cmd-S": this.triggerSave,
             "Shift-Ctrl-F": this.formatSql,
@@ -493,10 +503,12 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
           this.editor = CodeMirror.fromTextArea(this.$refs.editor, {
             lineNumbers: true,
             mode: this.connection.connectionType in modes ? modes[this.connection.connectionType] : "text/x-sql",
+            tabSize: 2,
             theme: 'monokai',
-            extraKeys: {"Ctrl-Space": "autocomplete", "Cmd-Space": "autocomplete", "Shift-Tab": "indentLess"},
+            extraKeys: {"Ctrl-Space": "autocomplete", "Shift-Tab": "indentLess"},
             hint: CodeMirror.hint.sql,
-            hintOptions: this.hintOptions
+            hintOptions: this.hintOptions,
+            getColumns: this.getColumnsForAutocomplete
           })
           this.editor.setValue(startingValue)
           this.editor.addKeyMap(runQueryKeyMap)
@@ -614,7 +626,7 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
       async saveQuery() {
         if (this.remoteDeleted) return
         if (!this.hasTitle || !this.hasText) {
-          this.saveError = new Error("您需要一个标题和一些查询文本")
+          this.saveError = new Error("您既需要标题，也需要一些查询文本。")
           return
         } else {
           try {
@@ -706,7 +718,7 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
           const defaultResult = Math.max(results.length - 1, 0)
 
           const nonEmptyResult = _.chain(results).findLastIndex((r) => !!r.rows?.length).value()
-          console.log("non empty result", nonEmptyResult)
+          console.log("非空结果", nonEmptyResult)
           this.selectedResult = nonEmptyResult === -1 ? results.length - 1 : nonEmptyResult
 
           this.$store.dispatch('data/usedQueries/save', { text: query, numberOfRecords: totalRows, queryId: this.query?.id, connectionId: this.connection.id })
@@ -742,7 +754,6 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
         if (editor.state.completionActive) return;
         if (triggers[e.keyCode] && !this.inQuote(editor, e)) {
           CodeMirror.commands.autocomplete(editor, null, { completeSingle: false });
-          // return
         }
         if (e.keyCode === space) {
           try {
@@ -778,6 +789,16 @@ import { FavoriteQuery } from '@/common/appdb/models/favorite_query'
       },
       fakeRemoteChange() {
         this.query.text = "select * from foo"
+      },
+      async getColumnsForAutocomplete(tableName) {
+        const tableToFind = this.tables.find(t => t.name === tableName)
+        if (!tableToFind) return null
+        // Only refresh columns if we don't have them cached.
+        if (!tableToFind.columns?.length) {
+          await this.$store.dispatch('updateTableColumns', tableToFind)
+        }
+
+        return tableToFind?.columns.map((c) => c.columnName)
       }
     },
     mounted() {

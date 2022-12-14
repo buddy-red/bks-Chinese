@@ -2,17 +2,17 @@
   <div class="merge-manager">
     <div v-if="pendingMerge" class="alert alert-notice">
       <i class="material-icons">info_outlined</i> 
-      <div class="alert-body">Merge Completed</div>
+      <div class="alert-body">已完成合并</div>
       <span class="alert-footer btn-group">
         <span class="expand"></span>
-        <a class="btn btn-sm btn-link" @click.prevent="undoMerge" title="What have you done to my query!?">撤销</a>
+        <a class="btn btn-sm btn-link" @click.prevent="undoMerge" title="你对我的查询做了什么!?">撤消</a>
         <a class="btn btn-sm btn-primary" @click.prevent="acceptMerge" title="Like magic">正常</a>
       </span>
     </div>
     
     <div v-else-if="pendingRemoteChanges" class="alert alert-info">
       <i class="material-icons">error_outline</i> 
-      <div class="alert-body">此查询已被其他人更新</div>
+      <div class="alert-body">此查询已由其他人更新</div>
       <span class="alert-footer btn-group">
         <span class="expand"></span>
         <x-button @click.prevent="viewDiff" class="btn btn-link">预览合并</x-button>
@@ -22,7 +22,7 @@
             <i class="material-icons">arrow_drop_down</i>
             <x-menu>
               <x-menuitem title="Discard local changes and reload with only the remote changes" @click.prevent="discardLocal">
-                <x-label>丢弃本地更改</x-label>
+                <x-label>放弃本地更改</x-label>
               </x-menuitem>
             </x-menu>
           </x-button>
@@ -30,15 +30,17 @@
       </span>
     </div>
 
-    <modal name="diff-modal" class="beekeeper-modal vue-dialog diff-modal" >
-      <div class="dialog-content">
-        <div class="dialog-c-title">合并预览</div>
-        <diff-viewer v-if="diff" :diff="diff"/>
-      </div>
-      <div class="vue-dialog-buttons">
-        <button class="btn btn-flat" @click.prevent="$modal.hide('diff-modal')">关闭</button>
-      </div>
-    </modal>
+    <portal to="modals">
+      <modal name="diff-modal" class="beekeeper-modal vue-dialog diff-modal" >
+        <div class="dialog-content">
+          <div class="dialog-c-title">合并预览</div>
+          <diff-viewer v-if="diff" :diff="diff"/>
+        </div>
+        <div class="vue-dialog-buttons">
+          <button class="btn btn-flat" @click.prevent="$modal.hide('diff-modal')">关闭</button>
+        </div>
+      </modal>
+    </portal>
   </div>
 </template>
 
@@ -99,10 +101,10 @@ export default Vue.extend({
 
       // otherwise we use optimistic patching
       const patcher = new DiffPatchMerge()
-      console.log("制作补丁: ", this.originalText, this.query.text)
+      console.log("Make Patch: ", this.originalText, this.query.text)
 
       const patch = patcher.patch_make(this.originalText, this.query.text)
-      console.log("应用补丁", this.unsavedText, patch)
+      console.log("Apply Patch", this.unsavedText, patch)
       const [final] = patcher.patch_apply(patch, this.unsavedText)
       return final
 

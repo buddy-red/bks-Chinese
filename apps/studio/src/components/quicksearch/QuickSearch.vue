@@ -3,28 +3,28 @@
     <div class="quicksearch-bg"></div>
     <div class="quicksearch-wrap" ref="menu">
       <div class="form-group">
-        <input type="text" ref="searchBox" placeholder="快捷搜索" v-model="searchTerm">
+        <input type="text" ref="searchBox" placeholder="Quick Search" v-model="searchTerm">
         <span class="clear" @click.prevent="searchTerm = null"><i class="material-icons">cancel</i></span>
       </div>
       <ul class="results no-results" v-if="!results.length && searchTerm">
-        <li>无搜索结果</li>
+        <li>无结果</li>
       </ul>
       <div class="results empty" v-if="!results.length && !searchTerm">
-        <p>请输入一个数据表或查询名称</p>
+        <p>输入数据表名称或查询名称</p>
         <div class="shortcut-item">
-          <div>打开 </div>
+          <div>Open </div>
           <div class="shortcut">
-            <span>回车键</span>
+            <span>Enter</span>
           </div> 
         </div>
         <div class="shortcut-item">
-          <div>Alt 打开</div>
+          <div>Alt Open</div>
           <div class="shortcut">
             <span v-if="this.$config.isMac">Cmd</span>
             <span v-if="!this.$config.isMac">Ctrl</span>
-            <span>回车键</span>
+            <span>Enter</span>
           </div>
-          <span class="hint">(仅限数据表)</span>
+          <span class="hint">(仅数据表)</span>
         </div>
       </div>
       <ul class="results" v-if="results && results.length">
