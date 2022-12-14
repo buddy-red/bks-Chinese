@@ -151,7 +151,7 @@ export function getTableKeys(client, database, table) {
 }
 
 function query(conn, queryText) { // eslint-disable-line no-unused-vars
-  throw new Error('"query" function is not implementd by cassandra client.');
+  throw new Error('"query" 函数未在cassandra客户端实现');
 }
 
 export function executeQuery(client, queryText) {

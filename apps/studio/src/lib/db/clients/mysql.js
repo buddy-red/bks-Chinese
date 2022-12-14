@@ -26,7 +26,7 @@ const mysqlErrors = {
 
 export default async function (server, database) {
   const dbConfig = configDatabase(server, database);
-  logger().debug('create driver client for mysql with config %j', dbConfig);
+  logger().debug('使用配置为mysql创建驱动程序客户端 %j', dbConfig);
 
   const conn = {
     pool: mysql.createPool(dbConfig),
@@ -496,8 +496,8 @@ export function query(conn, queryText) {
             err.sqlectronError = 'CANCELED_BY_USER';
             throw err
           } else if (queryText && _.trim(queryText).toUpperCase().startsWith("DELIMITER")) {
-            const nuError = new ClientError(`DELIMITER is only supported in the command line client, ${err.message}`)
-            nuError.helpLink = "https://docs.beekeeperstudio.io/pages/troubleshooting#mysql"
+            const nuError = new ClientError(`DELIMITER仅在命令行客户端中支持, ${err.message}`)
+            nuError.helpLink = "https://github.com/buddy-red/bks-Chinese"
             throw nuError
           } else {
             throw err;
@@ -510,7 +510,7 @@ export function query(conn, queryText) {
 
     async cancel() {
       if (!pid) {
-        throw new Error('Query not ready to be canceled');
+        throw new Error('查询尚未准备好取消');
       }
 
       canceling = true;
@@ -898,7 +898,7 @@ function configDatabase(server, database) {
 function getRealError(conn, err) {
   /* eslint no-underscore-dangle:0 */
   if (conn && conn._protocol && conn._protocol._fatalError) {
-    logger().warn("Query error", err, conn._protocol._fatalError)
+    logger().warn("查询出错", err, conn._protocol._fatalError)
     return conn._protocol._fatalError;
   }
   return err;
@@ -961,12 +961,12 @@ async function executeWithTransaction(conn, queryArgs) {
 function driverExecuteQuery(conn, queryArgs) {
   const runQuery = (connection) => new Promise((resolve, reject) => {
     const params = !queryArgs.params || _.isEmpty(queryArgs.params) ? undefined : queryArgs.params
-    logger().info(`Running Query`, queryArgs.query, params)
+    logger().info(`运行查询`, queryArgs.query, params)
     connection.query({ sql: queryArgs.query, values: params, rowsAsArray: queryArgs.rowsAsArray }, (err, data, fields) => {
       if (err && err.code === mysqlErrors.EMPTY_QUERY) return resolve({});
       if (err) return reject(getRealError(connection, err));
 
-      logger().info(`Running Query Finished`)
+      logger().info(`完成运行查询`)
       resolve({ data, fields });
     });
   });
@@ -994,7 +994,7 @@ async function runWithConnection({ pool }, run) {
 
       connection.on('error', (error) => {
         // it will be handled later in the next query execution
-        logger().error('Connection fatal error %j', error);
+        logger().error('连接导致出错 %j', error);
       });
 
       try {
