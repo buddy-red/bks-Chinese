@@ -18,7 +18,7 @@ interface BasicContext {
 }
 
 export function havingCli<U>(context: BasicContext, f: (c: any) => Promise<U>) {
-  return having(context.rootGetters.cloudClient, f, "You are not logged in")
+  return having(context.rootGetters.cloudClient, f, "您尚未登录")
 }
 
 export function safelyDo<U>(context: BasicContext, f: (c: any) => Promise<U>) {

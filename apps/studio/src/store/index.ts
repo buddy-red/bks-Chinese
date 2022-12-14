@@ -84,8 +84,8 @@ const store = new Vuex.Store<State>({
       showRoutines: true,
       showViews: true
     },
-    tablesLoading: "Loading tables...",
-    columnsLoading: 'Loading columns...',
+    tablesLoading: "加载数据表...",
+    columnsLoading: '加载数据列...',
     tablesInitialLoaded: false,
     connectionConfigs: [],
     username: null,
@@ -321,7 +321,7 @@ const store = new Vuex.Store<State>({
     async openUrl(context, url: string) {
       const conn = new SavedConnection();
       if (!conn.parse(url)) {
-        throw `Unable to parse ${url}`
+        throw `不能解析 ${url}`
       } else {
         await context.dispatch('connect', conn)
       }
@@ -354,22 +354,22 @@ const store = new Vuex.Store<State>({
         context.dispatch('recordUsedConfig', config)
         context.dispatch('updateWindowTitle', config)
       } else {
-        throw "No username provided"
+        throw "无用户名提供"
       }
     },
     async recordUsedConfig(context, config: IConnection) {
 
-      log.info("finding last used connection", config)
+      log.info("查找上次使用的连接", config)
       const lastUsedConnection = context.state.usedConfigs.find(c => {
         return config.id &&
           config.workspaceId &&
           c.connectionId === config.id &&
           c.workspaceId === config.workspaceId
       })
-      log.debug("Found used config", lastUsedConnection)
+      log.debug("找到使用过的配置", lastUsedConnection)
       if (!lastUsedConnection) {
         const usedConfig = new UsedConnection(config)
-        log.info("logging used connection", usedConfig, config)
+        log.info("记录使用的连接", usedConfig, config)
         await usedConfig.save()
         context.commit('usedConfigs', [...context.state.usedConfigs, usedConfig])
       } else {
@@ -403,7 +403,7 @@ const store = new Vuex.Store<State>({
         // FIXME: We should record which table we are loading columns for
         //        so that we know where to show this loading message. Not just
         //        show it for all tables.
-        context.commit("columnsLoading", "Loading columns...")
+        context.commit("columnsLoading", "加载数据列...")
         const connection = context.state.connection
         const columns = (table.entityType === 'materialized-view' ?
           await connection?.listMaterializedViewColumns(table.name, table.schema) :
@@ -411,7 +411,7 @@ const store = new Vuex.Store<State>({
 
         // TODO (don't update columns if nothing has changed (use duck typing))
         const updated = _.xorWith(table.columns, columns, _.isEqual)
-        log.debug('Should I update table columns?', updated)
+        log.debug('我应该更新表列吗?', updated)
         if (updated?.length) {
           table.columns = columns
           context.commit('table', table)

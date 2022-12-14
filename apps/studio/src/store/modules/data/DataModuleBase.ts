@@ -149,7 +149,7 @@ export function localActionsFor<T extends ApplicationEntity>(cls: any, other: an
 
     async update(context, item: T) {
       const existing = context.state.items.find((i) => i.id === item.id)
-      if (!existing) throw new Error("Could not find this item")
+      if (!existing) throw new Error("找不到此项目")
       cls.merge(existing, item)
       await existing.save()
       return existing.id

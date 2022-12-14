@@ -59,7 +59,7 @@ export const TabModule: Module<State, RootState> = {
     async load(context) {
       const { usedConfig } = context.rootState
       if (usedConfig?.id) {
-        log.info("Loading tabs for ", context.rootState.workspaceId, usedConfig.id)
+        log.info("加载标签页于 ", context.rootState.workspaceId, usedConfig.id)
         const tabs = await OpenTab.find({
           where: {
             connectionId: usedConfig.id,
