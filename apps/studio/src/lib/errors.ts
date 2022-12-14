@@ -9,8 +9,8 @@ export interface Error {
 export const errors: {[code: string]: Error} = {
   CANCELED_BY_USER: {
     code: 'CANCELED_BY_USER',
-    name: 'Query canceled by user',
-    message: 'Query canceled by user. The query process may still in the process list. But has already received the command to kill it successfully.',
+    name: '已被用户取消查询',
+    message: '查询被用户取消。查询进程可能还在进程列表中，但已经收到终止命令。',
   }
 };
 

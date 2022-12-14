@@ -26,7 +26,7 @@ export interface NativePlugin {
 }
 
 const copyNotification = new Noty({
-  text: "Text copied to clipboard",
+  text: "文本已复制到剪贴板",
   layout: "bottomRight",
   queue: "clipboard",
   timeout: 2000,

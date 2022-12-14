@@ -145,7 +145,7 @@ export abstract class Export {
       let rows: any[][]
       do {
         if (!this.cursor) {
-          throw new Error("Something went wrong")
+          throw new Error("出错")
         }
         rows = await this.cursor?.read()
         for (let rI = 0; rI < rows.length; rI++) {

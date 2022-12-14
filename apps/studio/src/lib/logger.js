@@ -5,8 +5,8 @@ import debug from 'debug';
 const loggers = {};
 
 export default function createLogger(namespace) {
-  if (!namespace) { throw new Error('Missing log namespace'); }
-  if (loggers[namespace]) { throw new Error('This logger is already registered'); }
+  if (!namespace) { throw new Error('缺失日志命名空间'); }
+  if (loggers[namespace]) { throw new Error('该记录器已经注册'); }
 
   // default logger
   const debugLogger = debug(`beekeeper:${namespace}`);

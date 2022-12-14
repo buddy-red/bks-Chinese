@@ -33,7 +33,7 @@ export default class {
   }
 
   addBeekeeper() {
-    this.vueApp.$noty.success("Beekeeper's Database has been added to your Saved Connections")
+    this.vueApp.$noty.success("数据库已添加到您的已保存连接")
     this.vueApp.$store.dispatch('data/connections/load')
   }
 
@@ -46,6 +46,6 @@ export default class {
   }
 
   menuStyle() {
-    this.vueApp.$noty.success("Restart Beekeeper for the change to take effect")
+    this.vueApp.$noty.success("重启保存更新")
   }
 }

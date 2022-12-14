@@ -12,17 +12,17 @@ export interface IDbConnectionPublicServer {
 
 export function createServer(config: IDbConnectionServerConfig): IDbConnectionPublicServer {
   if (!config) {
-    throw new Error('Missing server configuration');
+    throw new Error('缺失服务器配置');
   }
 
   const client = findClient(config.client)
 
   if (!client) {
-    throw new Error('Invalid SQL client');
+    throw new Error('无效SQL客户端');
   }
 
   if(config.socketPathEnabled && !client.supportsSocketPath) {
-    throw new Error(`${client.name} does not support socket path`);
+    throw new Error(`${client.name} 不支持socket路径`);
   }
 
   const server: IDbConnectionServer = {

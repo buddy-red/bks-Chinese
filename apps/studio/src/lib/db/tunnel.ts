@@ -11,13 +11,13 @@ import { IDbConnectionServerConfig, IDbSshTunnel } from './client';
 
 const logger = createLogger('db:tunnel');
 export default function connectTunnel(config: IDbConnectionServerConfig): Promise<IDbSshTunnel> {
-  logger().debug('setting up ssh tunnel')
+  logger().debug('设置ssh隧道')
 
   return new Promise((resolve, reject) => {
     (async () => {
       try {
         if (!config.ssh) {
-          throw new Error('Missing ssh config')
+          throw new Error('缺失ssh配置')
         }
 
         const sshConfig: Options = {
@@ -43,7 +43,7 @@ export default function connectTunnel(config: IDbConnectionServerConfig): Promis
           sshConfig.privateKey = undefined
         }
         const connection = new SSHConnection(sshConfig)
-        logger().debug("connection created!")
+        logger().debug("连接已创建!")
 
         const localPort = await pf.getPortPromise({ port: 10000, stopPort: 60000 })
         console.log("tunnel/ GOT TUNNEL PORT", localPort)
